@@ -1,10 +1,8 @@
 "use client";
 import React, { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { useRouter } from 'next/navigation';
 
 export default function HTMLPage() {
-  const router = useRouter();
   const router = useRouter();
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -99,14 +97,6 @@ function typeAnswer() {
   }, 2000);
 }
 setTimeout(typeAnswer, 3000);
-
-// ─── CLIENT ROUTING INTERCEPT ───
-document.querySelectorAll(`a[href="/sign-in"], a[href="/dashboard"]`).forEach(a => {
-  a.addEventListener(`click`, e => {
-    e.preventDefault();
-    router.push(a.getAttribute(`href`));
-  });
-});
 
 // ─── CLIENT ROUTING INTERCEPT ───
 document.querySelectorAll('a[href="/sign-in"], a[href="/dashboard"]').forEach(a => {
