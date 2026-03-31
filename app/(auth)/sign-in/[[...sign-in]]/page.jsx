@@ -202,7 +202,7 @@ export default function Page() {
 
           {/* Clerk Card wrapper */}
           <div className="rounded-2xl bg-white/60 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 p-6 shadow-2xl shadow-black/40">
-            <SignIn redirectUrl="/dashboard" />
+            <SignIn forceRedirectUrl="/dashboard" />
           </div>
 
           {/* Footer note */}

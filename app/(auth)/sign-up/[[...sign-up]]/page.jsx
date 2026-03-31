@@ -178,7 +178,7 @@ export default function Page() {
           </div>
 
           <div className="rounded-2xl bg-white/60 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 p-6 shadow-2xl shadow-black/40">
-            <SignUp redirectUrl="/dashboard" />
+            <SignUp forceRedirectUrl="/dashboard" />
           </div>
 
           <p className="text-center text-xs text-slate-600 mt-6">
