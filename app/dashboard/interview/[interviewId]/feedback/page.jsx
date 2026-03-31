@@ -16,7 +16,7 @@ import {
   Sparkles, Award, ArrowRight
 } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { callGeminiWithRetry } from "@/utils/GeminiAIModal";
+import { chatSession } from "@/utils/GeminiAIModal";
 import html2canvas from "html2canvas";
 import moment from "moment";
 import { useUser } from "@clerk/nextjs";
@@ -53,7 +53,7 @@ const CircularProgress = ({ score, outOf = 10, size = 180, strokeWidth = 12 }) =
         />
       </svg>
       <div className="absolute inset-0 flex flex-col items-center justify-center">
-        <span className="text-5xl font-extrabold text-slate-100 tabular-nums tracking-tight">
+        <span className="text-5xl font-extrabold text-slate-900 dark:text-slate-100 tabular-nums tracking-tight">
           {score.toFixed(1)}
         </span>
         <span className="text-sm font-medium text-slate-500 mt-1 uppercase tracking-widest">out of {outOf}</span>
@@ -77,6 +77,7 @@ const getScoreStyle = (n) => {
 
 /* ── Main Component ─────────────────────────────────────── */
 export default function Feedback({ params }) {
+  const { interviewId } = React.use(params);
   const [feedbackList, setFeedbackList] = useState([]);
   const [interviewData, setInterviewData] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -92,14 +93,14 @@ export default function Feedback({ params }) {
 
   useEffect(() => {
     fetchData();
-  }, [params.interviewId]);
+  }, [interviewId]);
 
   const fetchData = async () => {
     setIsLoading(true);
     try {
       const [feedbacks, interview] = await Promise.all([
-        db.select().from(UserAnswer).where(eq(UserAnswer.mockIdRef, params.interviewId)).orderBy(UserAnswer.id),
-        db.select().from(MockInterview).where(eq(MockInterview.mockId, params.interviewId))
+        db.select().from(UserAnswer).where(eq(UserAnswer.mockIdRef, interviewId)).orderBy(UserAnswer.id),
+        db.select().from(MockInterview).where(eq(MockInterview.mockId, interviewId))
       ]);
       setFeedbackList(feedbacks);
       setInterviewData(interview[0]);
@@ -114,12 +115,20 @@ export default function Feedback({ params }) {
     const valid = feedbackList.map(i => parseFloat(i[key])).filter(n => !isNaN(n));
     return valid.length ? (valid.reduce((a, b) => a + b, 0) / valid.length) : 0;
   };
+  
+  const calcSum = (key) => {
+    const valid = feedbackList.map(i => parseFloat(i[key])).filter(n => !isNaN(n));
+    return valid.reduce((a, b) => a + b, 0);
+  };
 
   const avgClarity    = calcAvg('clarityRating');
   const avgDepth      = calcAvg('depthRating');
-  const avgConfidence = calcAvg('confidenceScore');
+  const avgFluency    = calcAvg('confidenceScore');
   const avgAttention  = calcAvg('attentionScore');
   const avgRating     = calcAvg('rating');
+
+  const totalFillers = calcSum('fillerWordCount');
+  const avgDuration  = calcAvg('duration');
 
   const overallPct = Math.min(Math.max((avgRating / 10) * 100, 0), 100);
   const grade = getGrade(overallPct);
@@ -140,7 +149,7 @@ export default function Feedback({ params }) {
     setIsGeneratingModel(true);
     const prompt = `You are an expert ${interviewData?.jobPosition}. The candidate was asked: "${q.question}". Provide a concise, highly effective model answer. Max 4 sentences. Return ONLY the answer text.`;
     try {
-      const res = await callGeminiWithRetry(prompt);
+      const res = await chatSession.generateContent(prompt);
       setWeakestModelAnswer(res.response.text().trim());
     } catch (e) {
       setWeakestModelAnswer("Could not generate a model answer at this time.");
@@ -158,7 +167,7 @@ export default function Feedback({ params }) {
         scale: 2 // High res
       }); 
       const link = document.createElement('a');
-      link.download = `Interview_Report_${params.interviewId}.png`;
+      link.download = `Interview_Report_${interviewId}.png`;
       link.href = canvas.toDataURL('image/png');
       link.click();
     } catch (e) {
@@ -202,15 +211,15 @@ export default function Feedback({ params }) {
   if (feedbackList.length === 0) {
     return (
       <div className="min-h-[60vh] flex items-center justify-center">
-        <div className="max-w-md w-full text-center p-8 rounded-3xl bg-slate-900/40 border border-slate-800 shadow-xl">
-          <div className="flex items-center justify-center w-20 h-20 rounded-3xl bg-slate-800/80 border border-slate-700 mx-auto mb-6">
+        <div className="max-w-md w-full text-center p-8 rounded-3xl bg-white/40 dark:bg-slate-900/40 border border-slate-200 dark:border-slate-800 shadow-xl">
+          <div className="flex items-center justify-center w-20 h-20 rounded-3xl bg-slate-100/80 dark:bg-slate-800/80 border border-slate-300 dark:border-slate-700 mx-auto mb-6">
             <XCircle className="w-10 h-10 text-slate-500" />
           </div>
-          <h2 className="text-2xl font-bold text-slate-100 mb-3">No Data Found</h2>
-          <p className="text-slate-400 text-sm leading-relaxed mb-8">
+          <h2 className="text-2xl font-bold text-slate-900 dark:text-slate-100 mb-3">No Data Found</h2>
+          <p className="text-slate-600 dark:text-slate-400 text-sm leading-relaxed mb-8">
             We couldn't find any answer records for this interview session. Make sure you complete the questions and save your answers.
           </p>
-          <button onClick={() => router.replace('/dashboard')} className="w-full py-3.5 rounded-xl text-sm font-semibold text-white bg-slate-800 hover:bg-slate-700 border border-slate-700 transition-colors">
+          <button onClick={() => router.replace('/dashboard')} className="w-full py-3.5 rounded-xl text-sm font-semibold text-white bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:bg-slate-700 border border-slate-300 dark:border-slate-700 transition-colors">
             Return to Dashboard
           </button>
         </div>
@@ -225,7 +234,7 @@ export default function Feedback({ params }) {
       {/* ──────────────────────────────────────────────────────────
           1. HERO SECTION
       ────────────────────────────────────────────────────────── */}
-      <section className="relative rounded-3xl border border-slate-800/80 bg-slate-900/40 p-8 md:p-12 overflow-hidden animate-stagger-1 shadow-xl shadow-slate-900/50">
+      <section className="relative rounded-3xl border border-slate-200/80 dark:border-slate-800/80 bg-white/40 dark:bg-slate-900/40 p-8 md:p-12 overflow-hidden animate-stagger-1 shadow-xl shadow-slate-900/50">
         <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-indigo-500/10 rounded-full blur-[100px] pointer-events-none translate-x-1/3 -translate-y-1/3" />
         
         <div className="relative z-10 flex flex-col md:flex-row items-center gap-10">
@@ -240,11 +249,11 @@ export default function Feedback({ params }) {
             <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-emerald-500/30 bg-emerald-500/10 text-emerald-400 text-xs font-bold uppercase tracking-widest">
               <CheckCircle2 className="w-4 h-4" /> Interview Complete
             </div>
-            <h1 className="text-3xl md:text-4xl font-extrabold text-slate-100 tracking-tight">
+            <h1 className="text-3xl md:text-4xl font-extrabold text-slate-900 dark:text-slate-100 tracking-tight">
               {interviewData?.jobPosition}
             </h1>
-            <p className="text-slate-400 text-base md:text-lg leading-relaxed max-w-xl mx-auto md:mx-0">
-              You've successfully completed your mock interview for the <span className="text-slate-200 font-semibold">{interviewData?.jobExperience} years</span> experience level.
+            <p className="text-slate-600 dark:text-slate-400 text-base md:text-lg leading-relaxed max-w-xl mx-auto md:mx-0">
+              You've successfully completed your mock interview for the <span className="text-slate-800 dark:text-slate-200 font-semibold">{interviewData?.jobExperience} years</span> experience level.
               Review your detailed performance breakdown below.
             </p>
             <div className="text-sm text-slate-500 font-medium">
@@ -258,47 +267,47 @@ export default function Feedback({ params }) {
           2. PERFORMANCE BREAKDOWN
       ────────────────────────────────────────────────────────── */}
       <section className="animate-stagger-2">
-        <h2 className="text-lg font-bold text-slate-100 flex items-center gap-2 mb-5 px-1">
+        <h2 className="text-lg font-bold text-slate-900 dark:text-slate-100 flex items-center gap-2 mb-5 px-1">
           <Activity className="w-5 h-5 text-indigo-400" /> Key Metrics
         </h2>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           {/* Clarity */}
-          <div className="rounded-2xl p-5 border border-slate-800 bg-slate-900/60 shadow-lg">
+          <div className="rounded-2xl p-5 border border-slate-200 dark:border-slate-800 bg-white/60 dark:bg-slate-900/60 shadow-lg">
             <div className="flex items-center gap-2 mb-3">
               <MessageSquare className="w-4 h-4 text-sky-400" />
-              <span className="text-xs font-semibold text-slate-400 uppercase tracking-widest">Clarity</span>
+              <span className="text-xs font-semibold text-slate-600 dark:text-slate-400 uppercase tracking-widest">Clarity</span>
             </div>
-            <div className="text-3xl font-extrabold text-slate-100 tabular-nums">
+            <div className="text-3xl font-extrabold text-slate-900 dark:text-slate-100 tabular-nums">
               {avgClarity.toFixed(1)}<span className="text-sm text-slate-500 font-medium tracking-normal ml-0.5">/10</span>
             </div>
           </div>
           {/* Depth */}
-          <div className="rounded-2xl p-5 border border-slate-800 bg-slate-900/60 shadow-lg">
+          <div className="rounded-2xl p-5 border border-slate-200 dark:border-slate-800 bg-white/60 dark:bg-slate-900/60 shadow-lg">
             <div className="flex items-center gap-2 mb-3">
               <BookOpen className="w-4 h-4 text-purple-400" />
-              <span className="text-xs font-semibold text-slate-400 uppercase tracking-widest">Depth</span>
+              <span className="text-xs font-semibold text-slate-600 dark:text-slate-400 uppercase tracking-widest">Depth</span>
             </div>
-            <div className="text-3xl font-extrabold text-slate-100 tabular-nums">
+            <div className="text-3xl font-extrabold text-slate-900 dark:text-slate-100 tabular-nums">
               {avgDepth.toFixed(1)}<span className="text-sm text-slate-500 font-medium tracking-normal ml-0.5">/10</span>
             </div>
           </div>
-          {/* Confidence */}
-          <div className="rounded-2xl p-5 border border-slate-800 bg-slate-900/60 shadow-lg">
+          {/* Fluency / Filler words metric */}
+          <div className="rounded-2xl p-5 border border-slate-200 dark:border-slate-800 bg-white/60 dark:bg-slate-900/60 shadow-lg">
             <div className="flex items-center gap-2 mb-3">
               <Mic className="w-4 h-4 text-emerald-400" />
-              <span className="text-xs font-semibold text-slate-400 uppercase tracking-widest">Confidence</span>
+              <span className="text-xs font-semibold text-slate-600 dark:text-slate-400 uppercase tracking-widest">Fluency</span>
             </div>
-            <div className="text-3xl font-extrabold text-slate-100 tabular-nums">
-              {avgConfidence.toFixed(0)}<span className="text-sm text-slate-500 font-medium tracking-normal ml-0.5">%</span>
+            <div className="text-3xl font-extrabold text-slate-900 dark:text-slate-100 tabular-nums">
+              {avgFluency.toFixed(0)}<span className="text-sm text-slate-500 font-medium tracking-normal ml-0.5">%</span>
             </div>
           </div>
           {/* Eye Contact */}
-          <div className="rounded-2xl p-5 border border-slate-800 bg-slate-900/60 shadow-lg">
+          <div className="rounded-2xl p-5 border border-slate-200 dark:border-slate-800 bg-white/60 dark:bg-slate-900/60 shadow-lg">
             <div className="flex items-center gap-2 mb-3">
               <Eye className="w-4 h-4 text-amber-400" />
-              <span className="text-xs font-semibold text-slate-400 uppercase tracking-widest">Eye Contact</span>
+              <span className="text-xs font-semibold text-slate-600 dark:text-slate-400 uppercase tracking-widest">Eye Contact</span>
             </div>
-            <div className="text-3xl font-extrabold text-slate-100 tabular-nums">
+            <div className="text-3xl font-extrabold text-slate-900 dark:text-slate-100 tabular-nums">
               {avgAttention.toFixed(0)}<span className="text-sm text-slate-500 font-medium tracking-normal ml-0.5">%</span>
             </div>
           </div>
@@ -309,7 +318,7 @@ export default function Feedback({ params }) {
           3. QUESTION-BY-QUESTION BREAKDOWN
       ────────────────────────────────────────────────────────── */}
       <section className="animate-stagger-3">
-        <h2 className="text-lg font-bold text-slate-100 flex items-center gap-2 mb-5 px-1">
+        <h2 className="text-lg font-bold text-slate-900 dark:text-slate-100 flex items-center gap-2 mb-5 px-1">
           <Target className="w-5 h-5 text-indigo-400" /> Question Breakdown
         </h2>
         <div className="space-y-4">
@@ -321,7 +330,7 @@ export default function Feedback({ params }) {
             return (
               <Collapsible key={index} open={isOpen} onOpenChange={(open) => setExpandedIndex(open ? index : null)}>
                 <div className={`rounded-2xl border transition-all duration-300 overflow-hidden ${
-                  isOpen ? "border-indigo-500/40 bg-slate-900/80 shadow-lg shadow-indigo-500/5" : "border-slate-800 bg-slate-900/30 hover:bg-slate-900/50 hover:border-slate-700"
+                  isOpen ? "border-indigo-500/40 bg-white/80 dark:bg-slate-900/80 shadow-lg shadow-indigo-500/5" : "border-slate-200 dark:border-slate-800 bg-white/30 dark:bg-slate-900/30 hover:bg-white/50 dark:bg-slate-900/50 hover:border-slate-300 dark:border-slate-700"
                 }`}>
                   <CollapsibleTrigger className="w-full flex items-center gap-4 p-5 text-left group">
                     <div className={`flex items-center justify-center shrink-0 w-11 h-11 rounded-xl text-sm font-black border ${getScoreStyle(qRating)}`}>
@@ -336,45 +345,59 @@ export default function Feedback({ params }) {
                           </span>
                         )}
                       </div>
-                      <p className="text-sm md:text-base font-medium text-slate-200 line-clamp-1 group-hover:text-indigo-300 transition-colors">
+                      <p className="text-sm md:text-base font-medium text-slate-800 dark:text-slate-200 line-clamp-1 group-hover:text-indigo-300 transition-colors">
                         {item.question}
                       </p>
                     </div>
-                    {isOpen ? <ChevronUp className="w-5 h-5 text-slate-400 shrink-0" /> : <ChevronDown className="w-5 h-5 text-slate-400 shrink-0" />}
+                    {isOpen ? <ChevronUp className="w-5 h-5 text-slate-600 dark:text-slate-400 shrink-0" /> : <ChevronDown className="w-5 h-5 text-slate-600 dark:text-slate-400 shrink-0" />}
                   </CollapsibleTrigger>
 
                   <CollapsibleContent>
-                    <div className="p-5 pt-0 space-y-5 border-t border-slate-800/60 mt-2">
-                      {/* Detailed Scores */}
-                      <div className="flex flex-wrap gap-3 mt-4">
-                        <div className="px-3 py-1.5 rounded-lg bg-slate-800 border border-slate-700 text-xs font-semibold text-slate-300">
+                    <div className="p-5 pt-0 border-t border-slate-200/60 dark:border-slate-800/60 mt-2">
+                      {/* Score Pills */}
+                      <div className="flex flex-wrap gap-2 mt-4 mb-5">
+                        <div className="px-3 py-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-xs font-semibold text-slate-700 dark:text-slate-300">
                           Clarity: <span className="text-sky-400">{item.clarityRating || "N/A"}</span>/10
                         </div>
-                        <div className="px-3 py-1.5 rounded-lg bg-slate-800 border border-slate-700 text-xs font-semibold text-slate-300">
+                        <div className="px-3 py-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-xs font-semibold text-slate-700 dark:text-slate-300">
                           Relevance: <span className="text-indigo-400">{item.relevanceRating || "N/A"}</span>/10
                         </div>
-                        <div className="px-3 py-1.5 rounded-lg bg-slate-800 border border-slate-700 text-xs font-semibold text-slate-300">
+                        <div className="px-3 py-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-xs font-semibold text-slate-700 dark:text-slate-300">
                           Depth: <span className="text-purple-400">{item.depthRating || "N/A"}</span>/10
                         </div>
+                        {item.fillerWordCount != null && (
+                          <div className={`px-3 py-1.5 rounded-lg border text-xs font-semibold ${parseInt(item.fillerWordCount) <= 2 ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-400' : parseInt(item.fillerWordCount) <= 5 ? 'bg-amber-500/10 border-amber-500/30 text-amber-400' : 'bg-red-500/10 border-red-500/30 text-red-400'}`}>
+                            {item.fillerWordCount} filler word{item.fillerWordCount !== '1' ? 's' : ''} ({parseInt(item.fillerWordCount) <= 2 ? 'Fluent speaker' : parseInt(item.fillerWordCount) <= 5 ? 'Some hesitation' : 'Work on fluency'})
+                          </div>
+                        )}
+                        {item.duration != null && (
+                          <div className={`px-3 py-1.5 rounded-lg border text-xs font-semibold ${parseInt(item.duration) < 20 ? 'bg-amber-500/10 border-amber-500/30 text-amber-400' : parseInt(item.duration) <= 120 ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-400' : 'bg-red-500/10 border-red-500/30 text-red-400'}`}>
+                            {item.duration} seconds ({parseInt(item.duration) < 20 ? 'Too brief' : parseInt(item.duration) <= 120 ? 'Good length' : 'Too long'})
+                          </div>
+                        )}
                       </div>
 
-                      {/* Your Answer */}
-                      <div>
-                        <p className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-2 flex items-center gap-1.5">
-                          <Mic className="w-3.5 h-3.5" /> Your Answer
-                        </p>
-                        <div className="rounded-xl bg-slate-950/50 border border-slate-800 p-4 text-sm text-slate-300 leading-relaxed italic">
-                          "{item.userAns || 'No answer recorded.'}"
+                      {/* ── Side-by-Side Comparison ── */}
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        {/* LEFT: Your Answer */}
+                        <div className="flex flex-col">
+                          <div className="flex items-center gap-2 px-3 py-2 rounded-t-xl bg-slate-200/60 dark:bg-slate-800/80 border border-b-0 border-slate-300 dark:border-slate-700">
+                            <Mic className="w-3.5 h-3.5 text-slate-500" />
+                            <span className="text-xs font-bold text-slate-600 dark:text-slate-400 uppercase tracking-widest">Your Answer</span>
+                          </div>
+                          <div className="flex-1 rounded-b-xl rounded-tr-xl bg-slate-50/80 dark:bg-slate-950/60 border border-slate-200 dark:border-slate-800 p-4 text-sm text-slate-700 dark:text-slate-300 leading-relaxed italic min-h-[120px]">
+                            &ldquo;{item.userAns || 'No answer recorded.'}&rdquo;
+                          </div>
                         </div>
-                      </div>
-
-                      {/* AI Feedback */}
-                      <div>
-                        <p className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-2 flex items-center gap-1.5">
-                          <Sparkles className="w-3.5 h-3.5 text-indigo-400" /> Evaluator Feedback
-                        </p>
-                        <div className="rounded-xl bg-indigo-500/5 border border-indigo-500/20 p-4 text-sm text-indigo-200 leading-relaxed font-medium">
-                          {item.feedback}
+                        {/* RIGHT: Expected / AI Feedback */}
+                        <div className="flex flex-col">
+                          <div className="flex items-center gap-2 px-3 py-2 rounded-t-xl bg-indigo-600/10 border border-b-0 border-indigo-500/30">
+                            <Sparkles className="w-3.5 h-3.5 text-indigo-400" />
+                            <span className="text-xs font-bold text-indigo-400 uppercase tracking-widest">Expected / AI Feedback</span>
+                          </div>
+                          <div className="flex-1 rounded-b-xl rounded-tl-xl bg-indigo-500/5 border border-indigo-500/20 p-4 text-sm text-indigo-200 leading-relaxed font-medium min-h-[120px]">
+                            {item.feedback || 'No feedback available.'}
+                          </div>
                         </div>
                       </div>
                     </div>
@@ -395,7 +418,7 @@ export default function Feedback({ params }) {
             <h2 className="text-lg font-bold text-red-400 flex items-center gap-2 mb-2">
               <Lightbulb className="w-5 h-5" /> Areas for Improvement
             </h2>
-            <p className="text-sm text-slate-400 mb-6 leading-relaxed">
+            <p className="text-sm text-slate-600 dark:text-slate-400 mb-6 leading-relaxed">
               We noticed you struggled with {weakQuestions.length} question{weakQuestions.length > 1 ? 's' : ''}. Review the AI-generated model answer for your weakest response below.
             </p>
 
@@ -403,27 +426,27 @@ export default function Feedback({ params }) {
               {weakQuestions.map((q, idx) => {
                 const isWeakest = q.id === weakestQuestion?.id;
                 return (
-                  <div key={idx} className="rounded-2xl border border-red-500/30 bg-slate-900/80 p-5 shadow-lg">
+                  <div key={idx} className="rounded-2xl border border-red-500/30 bg-white/80 dark:bg-slate-900/80 p-5 shadow-lg">
                     <div className="flex gap-3 items-start">
                       <span className="mt-0.5 px-2 py-1 rounded bg-red-500/10 text-[10px] font-black text-red-400 border border-red-500/20 leading-none">
                         {q.rating}/10
                       </span>
-                      <p className="text-sm font-semibold text-slate-200">{q.question}</p>
+                      <p className="text-sm font-semibold text-slate-800 dark:text-slate-200">{q.question}</p>
                     </div>
 
                     {isWeakest && (
-                      <div className="mt-5 pt-5 border-t border-slate-800">
+                      <div className="mt-5 pt-5 border-t border-slate-200 dark:border-slate-800">
                         <p className="text-xs font-bold text-emerald-400 uppercase tracking-widest mb-3 flex items-center gap-1.5">
                           <Award className="w-4 h-4" /> Ideal Model Answer
                         </p>
                         {isGeneratingModel ? (
                           <div className="space-y-2 animate-pulse">
-                            <div className="h-3 bg-slate-800 rounded-full w-full" />
-                            <div className="h-3 bg-slate-800 rounded-full w-5/6" />
-                            <div className="h-3 bg-slate-800 rounded-full w-4/6" />
+                            <div className="h-3 bg-slate-100 dark:bg-slate-800 rounded-full w-full" />
+                            <div className="h-3 bg-slate-100 dark:bg-slate-800 rounded-full w-5/6" />
+                            <div className="h-3 bg-slate-100 dark:bg-slate-800 rounded-full w-4/6" />
                           </div>
                         ) : (
-                          <p className="text-sm text-slate-300 leading-relaxed bg-emerald-500/5 border border-emerald-500/10 p-4 rounded-xl">
+                          <p className="text-sm text-slate-700 dark:text-slate-300 leading-relaxed bg-emerald-500/5 border border-emerald-500/10 p-4 rounded-xl">
                             {weakestModelAnswer}
                           </p>
                         )}
@@ -438,20 +461,37 @@ export default function Feedback({ params }) {
       )}
 
       {/* ──────────────────────────────────────────────────────────
+          4.5 FLUENCY SUMMARY
+      ────────────────────────────────────────────────────────── */}
+      {(totalFillers > 0 || avgDuration > 0) && (
+        <section className="animate-stagger-4 pb-6 mt-6">
+          <div className="rounded-2xl border border-indigo-500/20 bg-indigo-500/5 p-6 flex flex-col items-center text-center max-w-2xl mx-auto shadow-lg">
+            <h2 className="text-lg font-bold text-indigo-400 flex items-center gap-2 mb-2">
+              <Mic className="w-5 h-5" /> Fluency Summary
+            </h2>
+            <p className="text-slate-700 dark:text-slate-300 font-medium">
+              You used <span className="text-indigo-400 font-bold">{totalFillers}</span> filler words across {feedbackList.length} answers.
+              Average answer length: <span className="text-indigo-400 font-bold">{Math.round(avgDuration)}</span> seconds.
+            </p>
+          </div>
+        </section>
+      )}
+
+      {/* ──────────────────────────────────────────────────────────
           5. SHARE CARD & BUTTONS
       ────────────────────────────────────────────────────────── */}
-      <section className="animate-stagger-5 pt-6 border-t border-slate-800 flex flex-col md:flex-row gap-8 items-center justify-between">
+      <section className="animate-stagger-5 pt-6 border-t border-slate-200 dark:border-slate-800 flex flex-col md:flex-row gap-8 items-center justify-between">
         
         {/* The DOM element we capture via html2canvas */}
         <div className="w-full max-w-sm rounded-[2rem] p-1 bg-gradient-to-b from-indigo-500/40 to-slate-800" ref={shareCardRef}>
-          <div className="bg-slate-950 rounded-[1.8rem] p-6 text-center space-y-4 relative overflow-hidden">
+          <div className="bg-slate-50 dark:bg-slate-950 rounded-[1.8rem] p-6 text-center space-y-4 relative overflow-hidden">
             {/* BG Decals */}
             <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-600/20 rounded-full blur-[40px] pointer-events-none" />
             
-            <div className="inline-flex px-3 py-1 bg-slate-900 border border-slate-800 rounded-full text-[10px] font-bold tracking-widest text-slate-400 uppercase">
+            <div className="inline-flex px-3 py-1 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-full text-[10px] font-bold tracking-widest text-slate-600 dark:text-slate-400 uppercase">
               AI Interview Report
             </div>
-            <h3 className="font-extrabold text-xl text-slate-100">{interviewData?.jobPosition}</h3>
+            <h3 className="font-extrabold text-xl text-slate-900 dark:text-slate-100">{interviewData?.jobPosition}</h3>
             
             <div className="mx-auto w-24 h-24 rounded-full border-4 flex items-center justify-center font-black text-3xl shadow-lg mt-2 mb-2" 
                  style={{ borderColor: grade.letter === 'A' ? '#10b981' : grade.letter === 'B' ? '#6366f1' : grade.letter === 'C' ? '#f59e0b' : '#ef4444', 
@@ -459,16 +499,16 @@ export default function Feedback({ params }) {
               {grade.letter}
             </div>
 
-            <p className="text-[10px] font-semibold text-slate-500 uppercase tracking-widest pb-2 border-b border-slate-800 w-3/4 mx-auto">
+            <p className="text-[10px] font-semibold text-slate-500 uppercase tracking-widest pb-2 border-b border-slate-200 dark:border-slate-800 w-3/4 mx-auto">
               Overall Rating: {avgRating.toFixed(1)}/10
             </p>
 
             <div className="grid grid-cols-2 gap-2 text-left pt-2">
-              <div className="bg-slate-900 rounded-xl p-3 border border-slate-800">
+              <div className="bg-white dark:bg-slate-900 rounded-xl p-3 border border-slate-200 dark:border-slate-800">
                 <div className="text-[9px] text-slate-500 uppercase font-black tracking-widest">Clarity</div>
                 <div className="text-lg font-bold text-sky-400">{avgClarity.toFixed(1)}</div>
               </div>
-              <div className="bg-slate-900 rounded-xl p-3 border border-slate-800">
+              <div className="bg-white dark:bg-slate-900 rounded-xl p-3 border border-slate-200 dark:border-slate-800">
                 <div className="text-[9px] text-slate-500 uppercase font-black tracking-widest">Depth</div>
                 <div className="text-lg font-bold text-purple-400">{avgDepth.toFixed(1)}</div>
               </div>
@@ -489,14 +529,14 @@ export default function Feedback({ params }) {
           
           <button
             onClick={() => router.push('/dashboard')}
-            className="w-full flex items-center justify-center gap-2 py-4 rounded-2xl text-sm font-bold text-slate-300 bg-slate-900 hover:bg-slate-800 border border-slate-700 transition-colors shadow-lg"
+            className="w-full flex items-center justify-center gap-2 py-4 rounded-2xl text-sm font-bold text-slate-700 dark:text-slate-300 bg-white dark:bg-slate-900 hover:bg-slate-100 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 transition-colors shadow-lg"
           >
             <RotateCcw className="w-4 h-4" /> Practice Again
           </button>
           
           <button
             onClick={() => router.push('/dashboard')}
-            className="w-full flex items-center justify-center gap-2 py-4 rounded-2xl text-sm font-bold text-slate-300 bg-slate-900 hover:bg-slate-800 border border-slate-700 transition-colors shadow-lg"
+            className="w-full flex items-center justify-center gap-2 py-4 rounded-2xl text-sm font-bold text-slate-700 dark:text-slate-300 bg-white dark:bg-slate-900 hover:bg-slate-100 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 transition-colors shadow-lg"
           >
             <Plus className="w-4 h-4" /> New Interview
           </button>

@@ -30,10 +30,10 @@ const InterviewList = () => {
   return (
     <div>
       <div className="flex items-center gap-2 mb-5">
-        <History className="w-4 h-4 text-slate-400" />
-        <h2 className="text-base font-semibold text-slate-300">Previous Sessions</h2>
+        <History className="w-4 h-4 text-slate-600 dark:text-slate-400" />
+        <h2 className="text-base font-semibold text-slate-700 dark:text-slate-300">Previous Sessions</h2>
         {!loading && (
-          <span className="ml-1 px-2 py-0.5 rounded-full bg-slate-800 border border-slate-700 text-xs text-slate-500">
+          <span className="ml-1 px-2 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-xs text-slate-500">
             {interviewList.length}
           </span>
         )}
@@ -45,10 +45,10 @@ const InterviewList = () => {
         </div>
       ) : interviewList.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-16 text-center">
-          <div className="w-16 h-16 rounded-2xl bg-slate-800/60 border border-slate-700 flex items-center justify-center mb-4">
+          <div className="w-16 h-16 rounded-2xl bg-slate-100/60 dark:bg-slate-800/60 border border-slate-300 dark:border-slate-700 flex items-center justify-center mb-4">
             <History className="w-7 h-7 text-slate-600" />
           </div>
-          <p className="text-slate-400 font-medium">No interviews yet</p>
+          <p className="text-slate-600 dark:text-slate-400 font-medium">No interviews yet</p>
           <p className="text-slate-600 text-sm mt-1">Create your first mock interview above.</p>
         </div>
       ) : (

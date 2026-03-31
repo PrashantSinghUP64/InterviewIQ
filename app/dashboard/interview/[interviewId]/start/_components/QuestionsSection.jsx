@@ -2,13 +2,6 @@
 import { Volume2, Hash, Brain, Loader2 } from "lucide-react";
 import React from "react";
 
-/* ── Adaptive badge colour map ────────────────────────────── */
-const BADGE_STYLES = {
-  advanced: "text-emerald-400 bg-emerald-500/15 border-emerald-500/30",
-  followup: "text-amber-400  bg-amber-500/15  border-amber-500/30",
-  simplify: "text-blue-400   bg-blue-500/15   border-blue-500/30",
-};
-
 /* ── Keyframes (injected once via <style>) ─────────────────── */
 const KEYFRAMES = `
   @keyframes fadeUpQ {
@@ -22,8 +15,6 @@ const QuestionsSection = ({
   mockInterviewQuestion,
   activeQuestionIndex,
   onQuestionSelect,
-  isGenerating   = false,
-  adaptiveBadge  = null,
   totalQuestions = 5,
 }) => {
   const textToSpeech = (text) => {
@@ -34,6 +25,13 @@ const QuestionsSection = ({
       alert("Sorry, your browser does not support text to speech");
     }
   };
+
+  React.useEffect(() => {
+    if (mockInterviewQuestion && mockInterviewQuestion[activeQuestionIndex]) {
+      // Auto-speak the question
+      textToSpeech(mockInterviewQuestion[activeQuestionIndex]?.question);
+    }
+  }, [activeQuestionIndex, mockInterviewQuestion]);
 
   if (!mockInterviewQuestion) return null;
 
@@ -53,17 +51,16 @@ const QuestionsSection = ({
             <button
               key={index}
               id={`question-tab-${index + 1}`}
-              onClick={() => exists && !isGenerating && onQuestionSelect?.(index)}
-              disabled={!exists || isGenerating}
-              title={!exists ? "Will be generated adaptively" : undefined}
+              onClick={() => exists && onQuestionSelect?.(index)}
+              disabled={!exists}
               className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all duration-200 ${
                 isActive
                   ? "bg-indigo-600 text-white shadow-md shadow-indigo-500/30"
                   : isAnswered && exists
                   ? "bg-emerald-600/20 text-emerald-400 border border-emerald-500/30 hover:border-emerald-400"
                   : exists && !isPending
-                  ? "bg-slate-800 text-slate-400 border border-slate-700 hover:border-indigo-500/40 hover:text-indigo-300"
-                  : "bg-slate-900/40 text-slate-700 border border-dashed border-slate-800 cursor-not-allowed"
+                  ? "bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border border-slate-300 dark:border-slate-700 hover:border-indigo-500/40 hover:text-indigo-300"
+                  : "bg-white/40 dark:bg-slate-900/40 text-slate-700 border border-dashed border-slate-200 dark:border-slate-800 cursor-not-allowed"
               }`}
             >
               Q{index + 1}
@@ -72,44 +69,10 @@ const QuestionsSection = ({
         })}
       </div>
 
-      {/* ── Question card: GENERATING state ──────────── */}
-      {isGenerating ? (
-        <div
-          key="generating"
-          className="flex-1 rounded-2xl bg-slate-900/60 border border-indigo-500/40 p-6 flex flex-col items-center justify-center gap-5 min-h-[220px]"
-          style={{ animation: "fadeUpQ 0.3s ease forwards" }}
-        >
-          {/* Spinner */}
-          <div className="flex items-center justify-center w-16 h-16 rounded-2xl bg-indigo-600/20 border border-indigo-500/30">
-            <Loader2 className="w-8 h-8 text-indigo-400 animate-spin" />
-          </div>
-
-          {/* Text */}
-          <div className="text-center space-y-1">
-            <p className="text-sm font-semibold text-indigo-300 animate-pulse">
-              Generating next question based on your answer...
-            </p>
-            <p className="text-xs text-slate-500">
-              AI is adapting the interview to your performance
-            </p>
-          </div>
-
-          {/* Bouncing dots */}
-          <div className="flex gap-1.5 items-center">
-            {[0, 1, 2].map((i) => (
-              <span
-                key={i}
-                className="w-2 h-2 rounded-full bg-indigo-500/70 animate-bounce"
-                style={{ animationDelay: `${i * 0.15}s` }}
-              />
-            ))}
-          </div>
-        </div>
-      ) : (
-        /* ── Question card: NORMAL state ──────────────── */
+        {/* ── Question card: NORMAL state ──────────────── */}
         <div
           key={`q-${activeQuestionIndex}`}
-          className="flex-1 rounded-2xl bg-slate-900/60 border border-slate-800 p-6 flex flex-col gap-5"
+          className="flex-1 rounded-2xl bg-white/60 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 p-6 flex flex-col gap-5"
           style={{ animation: "fadeUpQ 0.35s ease forwards" }}
         >
           {/* Header row: number badge + adaptive badge + TTS */}
@@ -124,26 +87,6 @@ const QuestionsSection = ({
                   Question {activeQuestionIndex + 1}
                 </span>
               </div>
-
-              {/* Adaptive badge */}
-              {adaptiveBadge && (
-                <div
-                  className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full border text-xs font-semibold ${
-                    BADGE_STYLES[adaptiveBadge.type] ?? BADGE_STYLES.followup
-                  }`}
-                >
-                  <Brain className="w-3 h-3" />
-                  {adaptiveBadge.label}
-                </div>
-              )}
-
-              {/* "Adaptive" label for any AI-generated question (no score-based badge yet, e.g. first load) */}
-              {!adaptiveBadge && mockInterviewQuestion[activeQuestionIndex]?.adaptive && (
-                <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full border text-xs font-semibold text-indigo-400 bg-indigo-500/10 border-indigo-500/30">
-                  <Brain className="w-3 h-3" />
-                  Adaptive
-                </div>
-              )}
             </div>
 
             {/* TTS button */}
@@ -152,7 +95,7 @@ const QuestionsSection = ({
               onClick={() =>
                 textToSpeech(mockInterviewQuestion[activeQuestionIndex]?.question)
               }
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs text-slate-400 border border-slate-700 hover:border-indigo-500/40 hover:text-indigo-300 hover:bg-indigo-600/5 transition-all duration-200 shrink-0"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs text-slate-600 dark:text-slate-400 border border-slate-300 dark:border-slate-700 hover:border-indigo-500/40 hover:text-indigo-300 hover:bg-indigo-600/5 transition-all duration-200 shrink-0"
               title="Read question aloud"
             >
               <Volume2 className="w-3.5 h-3.5" />
@@ -161,7 +104,7 @@ const QuestionsSection = ({
           </div>
 
           {/* Question text */}
-          <p className="text-slate-100 text-lg md:text-xl font-medium leading-relaxed flex-1">
+          <p className="text-slate-900 dark:text-slate-100 text-lg md:text-xl font-medium leading-relaxed flex-1">
             {mockInterviewQuestion[activeQuestionIndex]?.question}
           </p>
 
@@ -174,7 +117,6 @@ const QuestionsSection = ({
             </p>
           </div>
         </div>
-      )}
     </div>
   );
 };

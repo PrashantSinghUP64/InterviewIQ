@@ -1,247 +1,136 @@
-'use client';
+"use client";
+import React, { useEffect } from 'react';
 
-import React from 'react';
-import Link from 'next/link';
-import { Brain, Mic, MessageSquare, ArrowRight, Sparkles, ChevronRight } from 'lucide-react';
+export default function HTMLPage() {
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      try {
+        (function() {
+          
 
-const features = [
-  {
-    icon: <Brain className="w-8 h-8 text-indigo-400" />,
-    title: 'AI Questions',
-    desc: 'Role-specific questions generated in real-time by Gemini AI, tailored to your experience level and tech stack.',
-    gradient: 'from-indigo-500/10 to-indigo-500/5',
-    border: 'border-indigo-500/20 hover:border-indigo-500/50',
-    glow: 'group-hover:shadow-indigo-500/10',
-  },
-  {
-    icon: <Mic className="w-8 h-8 text-purple-400" />,
-    title: 'Voice Analysis',
-    desc: 'Speak your answers naturally. Our speech-to-text engine captures every word and feeds it to the AI for evaluation.',
-    gradient: 'from-purple-500/10 to-purple-500/5',
-    border: 'border-purple-500/20 hover:border-purple-500/50',
-    glow: 'group-hover:shadow-purple-500/10',
-  },
-  {
-    icon: <MessageSquare className="w-8 h-8 text-emerald-400" />,
-    title: 'Smart Feedback',
-    desc: 'Receive detailed ratings, model answers, and actionable improvement tips instantly after each interview session.',
-    gradient: 'from-emerald-500/10 to-emerald-500/5',
-    border: 'border-emerald-500/20 hover:border-emerald-500/50',
-    glow: 'group-hover:shadow-emerald-500/10',
-  },
+
+// ─── THEME TOGGLE ───
+const themeBtn = document.getElementById('themeBtn');
+let dark = true;
+themeBtn.addEventListener('click', () => {
+  dark = !dark;
+  document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
+  themeBtn.textContent = dark ? '🌙' : '☀️';
+});
+
+// ─── SCROLL REVEAL ───
+const obs = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting) { e.target.classList.add('visible'); obs.unobserve(e.target); }
+  });
+}, { threshold: 0.12 });
+document.querySelectorAll('.reveal').forEach(r => obs.observe(r));
+
+// ─── COUNTER ANIMATION ───
+function animCount(el, target) {
+  let s = 0;
+  const dur = 2000, step = 16;
+  const inc = target / (dur / step);
+  const timer = setInterval(() => {
+    s = Math.min(s + inc, target);
+    el.textContent = Math.floor(s).toLocaleString('en-IN');
+    if (s >= target) clearInterval(timer);
+  }, step);
+}
+const cObs = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      e.target.querySelectorAll('.counter-num[data-count]').forEach(el => {
+        const t = parseInt(el.dataset.count);
+        animCount(el, t);
+      });
+      cObs.unobserve(e.target);
+    }
+  });
+}, { threshold: 0.3 });
+document.querySelectorAll('.counter-section').forEach(s => cObs.observe(s));
+
+// Hero stats
+const sObs = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      e.target.querySelectorAll('.stat-num[data-target]').forEach(el => {
+        const t = parseInt(el.dataset.target);
+        let s = 0; const inc = t / 60;
+        const timer = setInterval(() => {
+          s = Math.min(s + inc, t);
+          el.textContent = Math.floor(s).toLocaleString('en-IN');
+          if (s >= t) clearInterval(timer);
+        }, 16);
+      });
+      sObs.unobserve(e.target);
+    }
+  });
+}, { threshold: 0.3 });
+document.querySelectorAll('.stats-bar').forEach(s => sObs.observe(s));
+
+// ─── FAQ TOGGLE ───
+document.querySelectorAll('.faq-item').forEach(item => {
+  item.addEventListener('click', () => {
+    const open = item.classList.contains('open');
+    document.querySelectorAll('.faq-item').forEach(i => i.classList.remove('open'));
+    if (!open) item.classList.add('open');
+  });
+});
+
+// ─── TYPING ANIMATION IN HERO CARD ───
+const answers = [
+  "useEffect runs asynchronously after paint, while useLayoutEffect runs synchronously after DOM mutations but before paint. I use useLayoutEffect when measuring DOM elements to prevent visual flicker.",
+  "useEffect is ideal for data fetching and subscriptions. useLayoutEffect is needed when you must read DOM layout and re-render to avoid flickers — like measuring element height before displaying a tooltip.",
 ];
+let aIdx = 0;
+function typeAnswer() {
+  const bubble = document.querySelector('.answer-bubble');
+  if (!bubble) return;
+  bubble.innerHTML = '<div class="typing-indicator"><span></span><span></span><span></span></div>';
+  setTimeout(() => {
+    bubble.innerHTML = '<p style="font-size:0.86rem;line-height:1.65;color:var(--text2);">' + answers[aIdx] + '</p>';
+    aIdx = (aIdx + 1) % answers.length;
+    setTimeout(typeAnswer, 5500);
+  }, 2000);
+}
+setTimeout(typeAnswer, 3000);
 
-const testimonials = [
-  {
-    quote: 'This AI mock interview platform made me so confident! I cracked my FAANG interview thanks to Let\'s Prepare.',
-    author: 'Arjun Sharma',
-    role: 'Software Engineer @ Google',
-    color: 'from-indigo-500/20 to-indigo-500/5',
-    border: 'border-indigo-500/30',
-  },
-  {
-    quote: 'Loved the instant feedback and analytics. Felt like a real interview experience. Highly recommend!',
-    author: 'Priya Patel',
-    role: 'Product Manager @ Microsoft',
-    color: 'from-purple-500/20 to-purple-500/5',
-    border: 'border-purple-500/30',
-  },
-];
+// ─── SMOOTH NAV ───
+document.querySelectorAll('a[href^="#"]').forEach(a => {
+  a.addEventListener('click', e => {
+    const href = a.getAttribute('href');
+    if (href === '#') return;
+    const target = document.querySelector(href);
+    if (target) { e.preventDefault(); target.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
+  });
+});
 
-const Page = () => {
+// ─── ARCHITECTURE NODE STAGGER on scroll ───
+const archObs = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      e.target.querySelectorAll('.arch-node, .arch-sub-node').forEach((node, i) => {
+        node.style.animationDelay = (i * 0.1) + 's';
+        node.style.opacity = '1';
+      });
+    }
+  });
+}, { threshold: 0.15 });
+document.querySelectorAll('.arch-diagram').forEach(d => archObs.observe(d));
+
+        })();
+      } catch(e) {
+        console.error("Custom script error", e);
+      }
+    }, 200);
+    return () => clearTimeout(timer);
+  }, []);
+
   return (
-    <div className="bg-slate-950 text-white min-h-screen font-sans">
-
-      {/* ── HEADER ──────────────────────────────────────── */}
-      <header className="fixed top-0 left-0 right-0 z-50 bg-slate-950/80 backdrop-blur-xl border-b border-slate-800/60">
-        <div className="max-w-7xl mx-auto flex justify-between items-center px-6 py-4">
-          <div className="flex items-center gap-2">
-            <Sparkles className="w-5 h-5 text-indigo-400" />
-            <span className="text-xl font-bold bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text text-transparent">
-              Let's Prepare
-            </span>
-          </div>
-          <nav className="hidden md:flex items-center gap-8">
-            <a href="#features" className="text-sm text-slate-400 hover:text-indigo-300 transition-colors duration-200">Features</a>
-            <a href="#testimonials" className="text-sm text-slate-400 hover:text-indigo-300 transition-colors duration-200">Testimonials</a>
-            <Link href="/dashboard">
-              <button className="text-sm px-5 py-2.5 rounded-lg bg-indigo-600/20 border border-indigo-500/40 text-indigo-300 hover:bg-indigo-600/40 hover:border-indigo-400 transition-all duration-200">
-                Dashboard
-              </button>
-            </Link>
-          </nav>
-        </div>
-      </header>
-
-      <main>
-        {/* ── HERO ────────────────────────────────────────── */}
-        <section className="relative min-h-screen flex flex-col items-center justify-center text-center px-6 overflow-hidden pt-20">
-          {/* Background orbs */}
-          <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-indigo-600/20 rounded-full blur-[120px] pointer-events-none" />
-          <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-purple-600/20 rounded-full blur-[100px] pointer-events-none" />
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-indigo-900/10 rounded-full blur-[80px] pointer-events-none" />
-
-          <div className="relative z-10 max-w-4xl mx-auto">
-            {/* Badge */}
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-indigo-500/10 border border-indigo-500/30 text-indigo-300 text-sm font-medium mb-8">
-              <Sparkles className="w-3.5 h-3.5" />
-              Powered by Gemini AI
-            </div>
-
-            {/* Headline */}
-            <h1 className="text-5xl md:text-7xl font-extrabold leading-tight tracking-tight mb-6">
-              <span className="bg-gradient-to-br from-slate-100 via-slate-200 to-slate-400 bg-clip-text text-transparent">
-                Ace Your Next
-              </span>
-              <br />
-              <span className="bg-gradient-to-r from-indigo-400 via-purple-400 to-indigo-300 bg-clip-text text-transparent">
-                Interview with AI
-              </span>
-            </h1>
-
-            {/* Subtitle */}
-            <p className="text-lg md:text-xl text-slate-400 max-w-2xl mx-auto leading-relaxed mb-12">
-              Practice with AI-generated mock interviews, get real-time voice analysis,
-              and receive expert feedback — all in one place.
-            </p>
-
-            {/* CTAs */}
-            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-              <Link href="/dashboard">
-                <button
-                  id="hero-start-interview-btn"
-                  className="group relative inline-flex items-center gap-2 px-8 py-4 text-base font-semibold text-white rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 transition-all duration-300 shadow-lg shadow-indigo-500/30 hover:shadow-indigo-500/50 hover:scale-105"
-                >
-                  Start Interview
-                  <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform duration-200" />
-                  {/* Glow ring */}
-                  <span className="absolute inset-0 rounded-xl ring-2 ring-indigo-500/0 group-hover:ring-indigo-500/50 transition-all duration-300" />
-                </button>
-              </Link>
-              <a
-                href="#features"
-                className="inline-flex items-center gap-2 px-8 py-4 text-base font-semibold text-slate-300 rounded-xl border border-slate-700 hover:border-indigo-500/60 hover:text-indigo-300 hover:bg-slate-800/50 transition-all duration-300"
-              >
-                See How It Works
-                <ChevronRight className="w-4 h-4" />
-              </a>
-            </div>
-
-            {/* Stats row */}
-            <div className="flex flex-wrap justify-center gap-8 mt-16 pt-8 border-t border-slate-800/60">
-              {[
-                { value: '500+', label: 'Interview Topics' },
-                { value: '10K+', label: 'Interviews Practised' },
-                { value: '4.9★', label: 'User Rating' },
-              ].map((stat) => (
-                <div key={stat.label} className="text-center">
-                  <div className="text-2xl font-bold text-slate-100">{stat.value}</div>
-                  <div className="text-xs text-slate-500 mt-1 uppercase tracking-wider">{stat.label}</div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* ── FEATURES ────────────────────────────────────── */}
-        <section id="features" className="py-28 px-6 relative">
-          <div className="absolute inset-0 bg-gradient-to-b from-slate-950 via-slate-900/50 to-slate-950 pointer-events-none" />
-          <div className="relative z-10 max-w-6xl mx-auto">
-            <div className="text-center mb-16">
-              <p className="text-xs font-semibold text-indigo-400 uppercase tracking-widest mb-3">Features</p>
-              <h2 className="text-4xl md:text-5xl font-bold text-slate-100 mb-4">
-                Everything you need to
-                <br />
-                <span className="bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text text-transparent">
-                  nail the interview
-                </span>
-              </h2>
-              <p className="text-slate-400 max-w-xl mx-auto">
-                Powerful tools designed to build confidence, sharpen your answers, and help you stand out.
-              </p>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              {features.map((f, i) => (
-                <div
-                  key={i}
-                  className={`group relative p-8 rounded-2xl bg-gradient-to-br ${f.gradient} border ${f.border} transition-all duration-300 hover:scale-[1.02] hover:shadow-2xl ${f.glow}`}
-                >
-                  <div className="flex items-center justify-center w-14 h-14 rounded-xl bg-slate-800/80 border border-slate-700/60 mb-6">
-                    {f.icon}
-                  </div>
-                  <h3 className="text-xl font-bold text-slate-100 mb-3">{f.title}</h3>
-                  <p className="text-slate-400 text-sm leading-relaxed">{f.desc}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* ── TESTIMONIALS ────────────────────────────────── */}
-        <section id="testimonials" className="py-24 px-6">
-          <div className="max-w-5xl mx-auto">
-            <div className="text-center mb-14">
-              <p className="text-xs font-semibold text-purple-400 uppercase tracking-widest mb-3">Testimonials</p>
-              <h2 className="text-4xl md:text-5xl font-bold text-slate-100">
-                What our users say
-              </h2>
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {testimonials.map((t, i) => (
-                <div
-                  key={i}
-                  className={`relative p-8 rounded-2xl bg-gradient-to-br ${t.color} border ${t.border} transition-all duration-300 hover:scale-[1.01]`}
-                >
-                  <div className="text-5xl text-indigo-400/60 font-serif leading-none mb-4">"</div>
-                  <p className="text-slate-300 leading-relaxed mb-6">{t.quote}</p>
-                  <div>
-                    <p className="font-semibold text-slate-100">{t.author}</p>
-                    <p className="text-sm text-slate-500">{t.role}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* ── CTA BANNER ─────────────────────────────────── */}
-        <section className="py-20 px-6">
-          <div className="max-w-3xl mx-auto text-center p-12 rounded-3xl bg-gradient-to-br from-indigo-600/20 to-purple-600/20 border border-indigo-500/30 relative overflow-hidden">
-            <div className="absolute inset-0 bg-gradient-to-r from-indigo-900/20 to-purple-900/20 pointer-events-none" />
-            <div className="relative z-10">
-              <h2 className="text-3xl md:text-4xl font-bold text-slate-100 mb-4">
-                Ready to land your dream job?
-              </h2>
-              <p className="text-slate-400 mb-8">Join thousands of candidates who've already improved their interview skills.</p>
-              <Link href="/dashboard">
-                <button
-                  id="cta-banner-btn"
-                  className="inline-flex items-center gap-2 px-8 py-4 text-base font-semibold text-white rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 transition-all duration-300 shadow-lg shadow-indigo-500/30 hover:shadow-indigo-500/50 hover:scale-105"
-                >
-                  Get Started Free
-                  <ArrowRight className="w-4 h-4" />
-                </button>
-              </Link>
-            </div>
-          </div>
-        </section>
-      </main>
-
-      {/* ── FOOTER ──────────────────────────────────────── */}
-      <footer className="border-t border-slate-800/60 py-8 px-6">
-        <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
-          <div className="flex items-center gap-2">
-            <Sparkles className="w-4 h-4 text-indigo-400" />
-            <span className="text-sm font-semibold bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text text-transparent">
-              Let's Prepare
-            </span>
-          </div>
-          <p className="text-sm text-slate-600">© 2025 Let's Prepare. All rights reserved.</p>
-        </div>
-      </footer>
-    </div>
+    <>
+      <style dangerouslySetInnerHTML={{ __html: "\n:root {\n  --bg: #060912;\n  --bg2: #0c1120;\n  --surface: rgba(255,255,255,0.05);\n  --surface2: rgba(255,255,255,0.09);\n  --border: rgba(255,255,255,0.09);\n  --text: #eef2ff;\n  --text2: rgba(238,242,255,0.52);\n  --accent: #6366f1;\n  --accent2: #06d6a0;\n  --accent3: #f72585;\n  --glow: rgba(99,102,241,0.28);\n  --card-bg: rgba(255,255,255,0.03);\n  --nav-bg: rgba(6,9,18,0.88);\n  --font: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;\n}\n[data-theme=\"light\"] {\n  --bg: #f4f6ff;\n  --bg2: #eaedff;\n  --surface: rgba(99,102,241,0.06);\n  --surface2: rgba(99,102,241,0.11);\n  --border: rgba(99,102,241,0.14);\n  --text: #0d0f20;\n  --text2: rgba(13,15,32,0.52);\n  --glow: rgba(99,102,241,0.14);\n  --card-bg: rgba(255,255,255,0.85);\n  --nav-bg: rgba(244,246,255,0.92);\n}\n*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }\nhtml { scroll-behavior:smooth; }\nbody {\n  font-family: var(--font);\n  background: var(--bg);\n  color: var(--text);\n  overflow-x: hidden;\n  min-height: 100vh;\n  font-size: 16px;\n  line-height: 1.6;\n  -webkit-font-smoothing: antialiased;\n}\n\n/* ─── MESH BACKGROUND ─── */\n.mesh {\n  position: fixed; inset: 0; z-index: 0; pointer-events: none;\n  background:\n    radial-gradient(ellipse 70% 55% at 18% 12%, rgba(99,102,241,0.16) 0%, transparent 65%),\n    radial-gradient(ellipse 55% 45% at 82% 78%, rgba(6,214,160,0.10) 0%, transparent 65%),\n    radial-gradient(ellipse 45% 55% at 55% 35%, rgba(247,37,133,0.06) 0%, transparent 65%);\n}\n\n\n\n/* ─── NAV ─── */\nnav {\n  position: fixed; top: 0; left: 0; right: 0; z-index: 1000;\n  display: flex; align-items: center; justify-content: space-between;\n  padding: 0 5%; height: 68px;\n  background: var(--nav-bg);\n  backdrop-filter: blur(20px) saturate(1.6);\n  border-bottom: 1px solid var(--border);\n  transition: all 0.3s;\n}\n.nav-logo {\n  display: flex; align-items: center; gap: 10px;\n  font-weight: 700; font-size: 1.1rem;\n  color: var(--text); text-decoration: none;\n  letter-spacing: -0.01em;\n}\n.logo-icon {\n  width: 34px; height: 34px;\n  background: linear-gradient(135deg, var(--accent), var(--accent2));\n  border-radius: 10px;\n  display: flex; align-items: center; justify-content: center;\n  font-size: 1rem; flex-shrink: 0;\n}\n.nav-links { display: flex; align-items: center; gap: 4px; }\n.nav-links a {\n  color: var(--text2); text-decoration: none;\n  padding: 8px 15px; border-radius: 8px;\n  font-size: 0.88rem; font-weight: 500;\n  transition: all 0.2s;\n}\n.nav-links a:hover { color: var(--text); background: var(--surface); }\n.nav-right { display: flex; align-items: center; gap: 10px; }\n.theme-btn {\n  width: 38px; height: 38px; border-radius: 9px;\n  background: var(--surface); border: 1px solid var(--border);\n  color: var(--text); cursor: pointer;\n  display: flex; align-items: center; justify-content: center;\n  font-size: 1rem; transition: all 0.2s;\n}\n.theme-btn:hover { background: var(--surface2); }\n.nav-cta {\n  background: linear-gradient(135deg, var(--accent), #7c3aed);\n  color: #fff; padding: 9px 20px; border-radius: 9px;\n  text-decoration: none; font-weight: 600; font-size: 0.88rem;\n  border: none; cursor: pointer;\n  box-shadow: 0 4px 18px var(--glow);\n  transition: all 0.25s;\n}\n.nav-cta:hover { transform: translateY(-1px); box-shadow: 0 6px 26px var(--glow); }\n\n/* ─── HERO ─── */\n.hero {\n  min-height: 100vh;\n  display: flex; align-items: center; justify-content: center;\n  padding: 120px 5% 70px;\n  position: relative; z-index: 1;\n  text-align: center;\n  flex-direction: column;\n}\n.hero-badge {\n  display: inline-flex; align-items: center; gap: 8px;\n  background: var(--surface); border: 1px solid var(--border);\n  border-radius: 100px; padding: 7px 16px;\n  font-size: 0.8rem; color: var(--text2);\n  margin-bottom: 26px;\n  animation: fadeUp 0.7s ease both;\n}\n.badge-dot {\n  width: 6px; height: 6px; border-radius: 50%;\n  background: var(--accent2);\n  animation: pulse 2.2s infinite;\n}\n@keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.4;transform:scale(1.4)} }\n.india-badge {\n  display: inline-flex; align-items: center; gap: 5px;\n  background: linear-gradient(135deg, rgba(255,153,0,0.14), rgba(19,136,8,0.11));\n  border: 1px solid rgba(255,153,0,0.22);\n  border-radius: 100px; padding: 3px 10px;\n  font-size: 0.74rem; font-weight: 600; color: var(--text);\n}\n.hero h1 {\n  font-size: clamp(2.6rem, 6.5vw, 5rem);\n  font-weight: 800; line-height: 1.1;\n  letter-spacing: -0.03em;\n  margin-bottom: 8px;\n  animation: fadeUp 0.8s 0.08s ease both;\n}\n.grad-text {\n  background: linear-gradient(135deg, var(--accent) 0%, var(--accent2) 60%, #a78bfa 100%);\n  -webkit-background-clip: text; -webkit-text-fill-color: transparent;\n  background-clip: text;\n}\n.hero-sub {\n  font-size: clamp(0.95rem, 1.8vw, 1.15rem);\n  color: var(--text2); max-width: 520px;\n  margin: 0 auto 34px; line-height: 1.72;\n  font-weight: 400;\n  animation: fadeUp 0.8s 0.15s ease both;\n}\n.hero-btns {\n  display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;\n  margin-bottom: 52px;\n  animation: fadeUp 0.8s 0.22s ease both;\n}\n.btn-primary {\n  display: inline-flex; align-items: center; gap: 8px;\n  background: linear-gradient(135deg, var(--accent), #7c3aed);\n  color: #fff; padding: 14px 28px; border-radius: 12px;\n  font-weight: 700; font-size: 0.95rem; text-decoration: none;\n  box-shadow: 0 8px 28px var(--glow);\n  transition: all 0.28s; letter-spacing: -0.01em;\n}\n.btn-primary:hover { transform: translateY(-2px); box-shadow: 0 12px 36px var(--glow); }\n.btn-secondary {\n  display: inline-flex; align-items: center; gap: 8px;\n  background: var(--surface); border: 1px solid var(--border);\n  color: var(--text); padding: 14px 24px; border-radius: 12px;\n  font-weight: 600; font-size: 0.95rem; text-decoration: none;\n  transition: all 0.25s;\n}\n.btn-secondary:hover { background: var(--surface2); border-color: var(--accent); }\n.stats-bar {\n  display: flex; gap: 36px; justify-content: center; flex-wrap: wrap;\n  animation: fadeUp 0.8s 0.3s ease both;\n}\n.stat { text-align: center; }\n.stat-num {\n  font-size: 1.7rem; font-weight: 800;\n  color: var(--text); display: inline-block; letter-spacing: -0.02em;\n}\n.stat-label { font-size: 0.75rem; color: var(--text2); letter-spacing: 0.04em; text-transform: uppercase; margin-top: 2px; }\n\n/* ─── HERO VISUAL CARD ─── */\n.hero-visual {\n  position: relative; margin-top: 56px; width: 100%; max-width: 620px;\n  animation: fadeUp 0.8s 0.38s ease both;\n}\n.interview-card {\n  background: var(--card-bg);\n  border: 1px solid var(--border);\n  border-radius: 18px;\n  padding: 26px 28px;\n  backdrop-filter: blur(20px);\n  box-shadow: 0 24px 64px rgba(0,0,0,0.35);\n  text-align: left;\n}\n.card-header { display: flex; align-items: center; gap: 12px; margin-bottom: 18px; }\n.card-avatar {\n  width: 40px; height: 40px; border-radius: 11px;\n  background: linear-gradient(135deg, var(--accent), var(--accent2));\n  display: flex; align-items: center; justify-content: center;\n  font-size: 1.1rem; flex-shrink: 0;\n}\n.card-meta h4 { font-size: 0.92rem; font-weight: 700; }\n.card-meta p { font-size: 0.76rem; color: var(--text2); }\n.question-bubble {\n  background: var(--surface); border: 1px solid var(--border);\n  border-radius: 12px; padding: 13px 16px;\n  margin-bottom: 12px; font-size: 0.88rem; line-height: 1.6;\n  position: relative;\n}\n.question-bubble::before {\n  content: 'Q'; position: absolute; top: -8px; left: 12px;\n  background: var(--accent); color: #fff;\n  font-size: 0.62rem; font-weight: 700;\n  padding: 2px 6px; border-radius: 4px;\n}\n.answer-bubble {\n  background: linear-gradient(135deg, rgba(99,102,241,0.11), rgba(6,214,160,0.07));\n  border: 1px solid rgba(99,102,241,0.18);\n  border-radius: 12px; padding: 13px 16px;\n  margin-bottom: 12px; font-size: 0.88rem; line-height: 1.6;\n  position: relative;\n}\n.answer-bubble::before {\n  content: 'A'; position: absolute; top: -8px; left: 12px;\n  background: var(--accent2); color: #000;\n  font-size: 0.62rem; font-weight: 700;\n  padding: 2px 6px; border-radius: 4px;\n}\n.typing-indicator { display: inline-flex; gap: 4px; align-items: center; padding: 8px 4px; }\n.typing-indicator span {\n  width: 6px; height: 6px; border-radius: 50%;\n  background: var(--accent);\n  animation: typing 1.2s infinite;\n}\n.typing-indicator span:nth-child(2) { animation-delay: 0.2s; }\n.typing-indicator span:nth-child(3) { animation-delay: 0.4s; }\n@keyframes typing { 0%,60%,100%{transform:translateY(0);opacity:0.4} 30%{transform:translateY(-6px);opacity:1} }\n.score-pills { display: flex; gap: 7px; flex-wrap: wrap; margin-top: 14px; }\n.pill { padding: 5px 12px; border-radius: 100px; font-size: 0.75rem; font-weight: 600; }\n.pill-green { background: rgba(6,214,160,0.13); color: var(--accent2); border: 1px solid rgba(6,214,160,0.22); }\n.pill-purple { background: rgba(99,102,241,0.13); color: #a78bfa; border: 1px solid rgba(99,102,241,0.22); }\n.pill-red { background: rgba(247,37,133,0.1); color: #f72585; border: 1px solid rgba(247,37,133,0.18); }\n.float-card {\n  position: absolute;\n  background: var(--card-bg); border: 1px solid var(--border);\n  border-radius: 12px; padding: 12px 16px;\n  backdrop-filter: blur(16px);\n  box-shadow: 0 10px 36px rgba(0,0,0,0.22);\n  font-size: 0.8rem;\n}\n.float-card-1 { top: -26px; right: -36px; min-width: 150px; animation: float1 4s ease-in-out infinite; }\n.float-card-2 { bottom: -18px; left: -36px; min-width: 142px; animation: float2 5s ease-in-out infinite; }\n@keyframes float1 { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-10px)} }\n@keyframes float2 { 0%,100%{transform:translateY(0)} 50%{transform:translateY(8px)} }\n.float-icon { font-size: 1.4rem; margin-bottom: 5px; }\n.float-title { font-weight: 700; color: var(--text); font-size: 0.82rem; }\n.float-sub { color: var(--text2); font-size: 0.73rem; }\n\n/* ─── SECTIONS ─── */\nsection { position: relative; z-index: 1; padding: 80px 5%; }\n.section-tag {\n  display: inline-block;\n  background: var(--surface); border: 1px solid var(--border);\n  color: var(--accent); font-size: 0.72rem; font-weight: 700;\n  letter-spacing: 0.1em; text-transform: uppercase;\n  padding: 5px 13px; border-radius: 100px; margin-bottom: 18px;\n}\n.section-title {\n  font-size: clamp(1.8rem, 3.8vw, 2.8rem);\n  font-weight: 800; line-height: 1.18;\n  letter-spacing: -0.025em;\n  margin-bottom: 14px;\n}\n.section-sub {\n  font-size: 1rem; color: var(--text2);\n  max-width: 500px; line-height: 1.72;\n  margin-bottom: 44px;\n}\n\n/* ─── COMPANIES ─── */\n.companies { text-align: center; }\n.companies p { font-size: 0.8rem; color: var(--text2); letter-spacing: 0.07em; text-transform: uppercase; margin-bottom: 20px; }\n.company-tags { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; }\n.company-tag {\n  padding: 9px 18px; border-radius: 9px;\n  background: var(--surface); border: 1px solid var(--border);\n  font-size: 0.82rem; font-weight: 600; color: var(--text2);\n  transition: all 0.2s;\n}\n.company-tag:hover { color: var(--text); border-color: var(--accent); background: var(--surface2); }\n\n/* ─── FEATURES GRID ─── */\n.features-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(270px, 1fr)); gap: 18px; }\n.feature-card {\n  background: var(--card-bg); border: 1px solid var(--border);\n  border-radius: 18px; padding: 26px;\n  transition: all 0.28s; position: relative; overflow: hidden;\n}\n.feature-card::after {\n  content: ''; position: absolute; inset: 0;\n  background: linear-gradient(135deg, var(--accent), var(--accent2));\n  opacity: 0; transition: opacity 0.3s; border-radius: 18px;\n}\n.feature-card:hover { transform: translateY(-4px); border-color: rgba(99,102,241,0.4); }\n.feature-card:hover::after { opacity: 0.04; }\n.feature-icon {\n  width: 46px; height: 46px; border-radius: 12px;\n  display: flex; align-items: center; justify-content: center;\n  font-size: 1.25rem; margin-bottom: 16px;\n  position: relative; z-index: 1;\n}\n.icon-purple { background: rgba(99,102,241,0.14); }\n.icon-green  { background: rgba(6,214,160,0.13); }\n.icon-blue   { background: rgba(59,130,246,0.13); }\n.icon-yellow { background: rgba(251,191,36,0.13); }\n.icon-pink   { background: rgba(236,72,153,0.13); }\n.icon-red    { background: rgba(247,37,133,0.1); }\n.feature-card h3 { font-size: 1rem; font-weight: 700; margin-bottom: 8px; position: relative; z-index: 1; }\n.feature-card p  { font-size: 0.85rem; color: var(--text2); line-height: 1.68; position: relative; z-index: 1; }\n.feature-tag {\n  display: inline-block; margin-top: 13px;\n  font-size: 0.7rem; font-weight: 700; letter-spacing: 0.04em;\n  padding: 4px 9px; border-radius: 6px;\n  position: relative; z-index: 1;\n}\n\n/* ─── PROGRESS ─── */\n.progress-section {\n  background: var(--surface); border: 1px solid var(--border);\n  border-radius: 20px; padding: 34px;\n}\n.progress-item { margin-bottom: 18px; }\n.progress-item:last-child { margin-bottom: 0; }\n.progress-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }\n.progress-label { font-size: 0.84rem; font-weight: 600; }\n.progress-val { font-size: 0.84rem; color: var(--accent); font-weight: 700; }\n.progress-bar { height: 5px; background: var(--surface2); border-radius: 100px; overflow: hidden; }\n.progress-fill {\n  height: 100%; border-radius: 100px;\n  background: linear-gradient(90deg, var(--accent), var(--accent2));\n  animation: fillBar 2s ease both;\n}\n@keyframes fillBar { from{width:0} }\n\n/* ─── ARCHITECTURE SECTION ─── */\n.arch-section {\n  padding: 80px 5%;\n  position: relative; z-index: 1;\n}\n.arch-diagram {\n  max-width: 900px; margin: 0 auto;\n  display: flex; flex-direction: column; align-items: center; gap: 0;\n}\n.arch-row {\n  display: flex; align-items: center; gap: 0;\n  width: 100%;\n}\n.arch-row.center { justify-content: center; }\n.arch-node {\n  background: var(--card-bg);\n  border: 1px solid var(--border);\n  border-radius: 16px; padding: 20px 24px;\n  text-align: center; min-width: 170px;\n  position: relative;\n  transition: all 0.3s;\n  animation: nodeAppear 0.6s ease both;\n  flex-shrink: 0;\n}\n.arch-node:hover {\n  border-color: var(--accent);\n  transform: translateY(-3px);\n  box-shadow: 0 12px 32px var(--glow);\n}\n.arch-node-icon { font-size: 1.6rem; margin-bottom: 8px; }\n.arch-node-title { font-size: 0.88rem; font-weight: 700; color: var(--text); margin-bottom: 4px; }\n.arch-node-sub { font-size: 0.74rem; color: var(--text2); line-height: 1.5; }\n.arch-node.accent-node {\n  background: linear-gradient(135deg, rgba(99,102,241,0.16), rgba(6,214,160,0.10));\n  border-color: rgba(99,102,241,0.35);\n}\n.arch-node.central {\n  min-width: 190px; padding: 24px 28px;\n  background: linear-gradient(135deg, rgba(99,102,241,0.18), rgba(124,58,237,0.14));\n  border-color: rgba(99,102,241,0.45);\n  box-shadow: 0 0 40px rgba(99,102,241,0.18);\n}\n\n/* Connectors */\n.arch-arrow-h {\n  flex: 1; height: 2px;\n  background: linear-gradient(90deg, transparent, var(--accent), transparent);\n  position: relative; min-width: 30px; max-width: 60px;\n  animation: arrowPulse 2s ease-in-out infinite;\n}\n.arch-arrow-h::after {\n  content: '';\n  position: absolute; right: -1px; top: 50%;\n  transform: translateY(-50%);\n  width: 0; height: 0;\n  border-left: 6px solid var(--accent);\n  border-top: 4px solid transparent;\n  border-bottom: 4px solid transparent;\n}\n.arch-arrow-v {\n  width: 2px; height: 40px; align-self: center;\n  background: linear-gradient(180deg, transparent, var(--accent), transparent);\n  position: relative; margin: 0 auto;\n  animation: arrowPulse 2s ease-in-out infinite;\n}\n.arch-arrow-v::after {\n  content: '';\n  position: absolute; bottom: -1px; left: 50%;\n  transform: translateX(-50%);\n  width: 0; height: 0;\n  border-top: 6px solid var(--accent);\n  border-left: 4px solid transparent;\n  border-right: 4px solid transparent;\n}\n\n@keyframes arrowPulse {\n  0%,100%{ opacity:0.5; }\n  50%{ opacity:1; }\n}\n@keyframes nodeAppear {\n  from{ opacity:0; transform:translateY(16px); }\n  to{ opacity:1; transform:translateY(0); }\n}\n\n/* Flow Labels */\n.flow-label {\n  font-size: 0.68rem; color: var(--accent); font-weight: 700;\n  letter-spacing: 0.06em; text-transform: uppercase;\n  text-align: center; margin: 4px 0;\n}\n\n/* Animated data flow dots */\n.data-flow {\n  position: relative; display: flex; align-items: center; flex: 1; min-width: 30px; max-width: 60px;\n}\n.data-flow-line {\n  position: absolute; top: 50%; left: 0; right: 0;\n  height: 2px; background: linear-gradient(90deg, transparent, var(--accent), transparent);\n  transform: translateY(-50%);\n}\n.data-dot {\n  position: absolute; top: 50%;\n  width: 6px; height: 6px; border-radius: 50%;\n  background: var(--accent2);\n  transform: translateY(-50%);\n  animation: flowDot 2s linear infinite;\n}\n@keyframes flowDot {\n  0%{ left:-4px; opacity:0; }\n  10%{ opacity:1; }\n  90%{ opacity:1; }\n  100%{ left:calc(100% + 4px); opacity:0; }\n}\n\n/* Sub-nodes row */\n.arch-sub-row {\n  display: flex; gap: 16px; justify-content: center;\n  flex-wrap: wrap;\n}\n.arch-sub-node {\n  background: var(--surface);\n  border: 1px solid var(--border);\n  border-radius: 12px;\n  padding: 14px 18px;\n  text-align: center;\n  min-width: 130px;\n  transition: all 0.25s;\n  animation: nodeAppear 0.6s ease both;\n}\n.arch-sub-node:hover { border-color: var(--accent2); transform: translateY(-2px); }\n.arch-sub-node-icon { font-size: 1.2rem; margin-bottom: 6px; }\n.arch-sub-node-title { font-size: 0.78rem; font-weight: 700; color: var(--text); }\n.arch-sub-node-sub { font-size: 0.68rem; color: var(--text2); }\n\n/* Vertical connector group */\n.arch-v-connectors {\n  display: flex; gap: 16px; justify-content: center; flex-wrap: wrap;\n  margin: 0;\n}\n.arch-v-conn {\n  width: 2px; height: 32px;\n  background: linear-gradient(180deg, var(--accent), transparent);\n  flex-shrink: 0;\n}\n\n/* ─── COUNTER STATS ─── */\n.counter-section {\n  background: linear-gradient(135deg, rgba(99,102,241,0.09), rgba(6,214,160,0.05));\n  border: 1px solid var(--border); border-radius: 22px;\n  padding: 44px;\n  display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 28px;\n  text-align: center;\n}\n.counter-num {\n  font-size: 2.6rem; font-weight: 800;\n  background: linear-gradient(135deg, var(--accent), var(--accent2));\n  -webkit-background-clip: text; -webkit-text-fill-color: transparent;\n  background-clip: text; display: block; letter-spacing: -0.03em;\n}\n.counter-label { font-size: 0.82rem; color: var(--text2); margin-top: 4px; }\n\n/* ─── HOW IT WORKS ─── */\n.how-container { max-width: 840px; margin: 0 auto; }\n.step {\n  display: grid; grid-template-columns: 54px 1fr; gap: 22px;\n  padding: 28px 0;\n  border-bottom: 1px solid var(--border);\n}\n.step:last-child { border-bottom: none; }\n.step-num {\n  width: 50px; height: 50px; border-radius: 13px;\n  background: var(--surface); border: 1px solid var(--border);\n  display: flex; align-items: center; justify-content: center;\n  font-size: 1.1rem; font-weight: 800;\n  color: var(--accent); flex-shrink: 0;\n  transition: all 0.28s;\n}\n.step:hover .step-num {\n  background: var(--accent); color: #fff; border-color: var(--accent);\n  transform: rotate(4deg) scale(1.04);\n}\n.step-content h3 { font-size: 1.02rem; font-weight: 700; margin-bottom: 7px; }\n.step-content p  { font-size: 0.86rem; color: var(--text2); line-height: 1.7; }\n\n/* ─── FAQ ─── */\n.faq-list { max-width: 700px; margin: 0 auto; }\n.faq-item { border-bottom: 1px solid var(--border); padding: 18px 0; cursor: pointer; }\n.faq-q {\n  display: flex; justify-content: space-between; align-items: center;\n  font-weight: 600; font-size: 0.92rem;\n  transition: color 0.2s;\n}\n.faq-item:hover .faq-q { color: var(--accent); }\n.faq-icon {\n  width: 26px; height: 26px; border-radius: 7px;\n  background: var(--surface); border: 1px solid var(--border);\n  display: flex; align-items: center; justify-content: center;\n  font-size: 0.85rem; flex-shrink: 0; transition: all 0.28s;\n}\n.faq-item.open .faq-icon { background: var(--accent); border-color: var(--accent); color: #fff; transform: rotate(45deg); }\n.faq-a {\n  font-size: 0.85rem; color: var(--text2); line-height: 1.7;\n  max-height: 0; overflow: hidden; transition: all 0.32s ease;\n}\n.faq-item.open .faq-a { max-height: 200px; padding-top: 12px; }\n\n/* ─── CTA ─── */\n.cta-section {\n  background: linear-gradient(135deg, rgba(99,102,241,0.13), rgba(6,214,160,0.08));\n  border: 1px solid var(--border); border-radius: 26px;\n  padding: 60px 44px; text-align: center;\n  position: relative; overflow: hidden;\n}\n.cta-section::before {\n  content: ''; position: absolute;\n  width: 380px; height: 380px; border-radius: 50%;\n  background: radial-gradient(circle, var(--accent) 0%, transparent 70%);\n  opacity: 0.07; top: -100px; right: -80px;\n  animation: float1 7s ease-in-out infinite;\n}\n.cta-section h2 {\n  font-size: clamp(1.7rem, 3.6vw, 2.6rem); font-weight: 800;\n  margin-bottom: 14px; position: relative; z-index: 1;\n  letter-spacing: -0.02em;\n}\n.cta-section p {\n  color: var(--text2); font-size: 1rem;\n  max-width: 460px; margin: 0 auto 28px; line-height: 1.72;\n  position: relative; z-index: 1;\n}\n.cta-btns { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; position: relative; z-index: 1; }\n.free-badge {\n  font-size: 0.76rem; color: var(--text2); margin-top: 14px;\n  position: relative; z-index: 1;\n  display: flex; align-items: center; justify-content: center; gap: 10px;\n}\n.free-badge span { opacity: 0.4; }\n\n/* ─── FOOTER ─── */\nfooter {\n  position: relative; z-index: 1;\n  padding: 48px 5% 30px;\n  border-top: 1px solid var(--border);\n}\n.footer-grid {\n  display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 44px;\n  margin-bottom: 36px;\n}\n.footer-brand h3 { font-size: 1.1rem; font-weight: 700; margin-bottom: 10px; display: flex; align-items: center; gap: 8px; }\n.footer-brand p { font-size: 0.84rem; color: var(--text2); line-height: 1.7; max-width: 280px; }\n.footer-links h4 { font-size: 0.82rem; font-weight: 700; margin-bottom: 14px; color: var(--text2); text-transform: uppercase; letter-spacing: 0.06em; }\n.footer-links a {\n  display: block; font-size: 0.85rem; color: var(--text2);\n  text-decoration: none; margin-bottom: 9px;\n  transition: color 0.2s;\n}\n.footer-links a:hover { color: var(--accent); }\n\n/* ─── SOCIAL ICONS (SVG) ─── */\n.social-links { display: flex; gap: 8px; margin-top: 18px; flex-wrap: wrap; }\n.social-link {\n  width: 38px; height: 38px; border-radius: 9px;\n  background: var(--surface); border: 1px solid var(--border);\n  display: flex; align-items: center; justify-content: center;\n  text-decoration: none; color: var(--text2);\n  transition: all 0.22s;\n}\n.social-link:hover { border-color: var(--accent); color: var(--accent); transform: translateY(-2px); background: var(--surface2); }\n.social-link svg { width: 17px; height: 17px; fill: currentColor; }\n\n/* LinkedIn hover */\n.social-link.soc-linkedin:hover { color: #0a66c2; border-color: #0a66c2; }\n.social-link.soc-github:hover   { color: var(--text); border-color: var(--text); }\n.social-link.soc-twitter:hover  { color: #1d9bf0; border-color: #1d9bf0; }\n.social-link.soc-youtube:hover  { color: #ff0000; border-color: #ff0000; }\n.social-link.soc-email:hover    { color: var(--accent2); border-color: var(--accent2); }\n.social-link.soc-link:hover     { color: #43e97b; border-color: #43e97b; }\n\n.footer-bottom {\n  display: flex; justify-content: space-between; align-items: center;\n  flex-wrap: wrap; gap: 10px;\n  padding-top: 22px; border-top: 1px solid var(--border);\n}\n.footer-bottom p { font-size: 0.8rem; color: var(--text2); }\n.built-by { font-size: 0.8rem; color: var(--text2); }\n.built-by a { color: var(--accent); text-decoration: none; font-weight: 600; }\n\n/* ─── AI FAB ─── */\n.ai-fab {\n  position: fixed; bottom: 24px; right: 24px; z-index: 999;\n  width: 52px; height: 52px; border-radius: 14px;\n  background: linear-gradient(135deg, var(--accent), #7c3aed);\n  border: none; cursor: pointer;\n  display: flex; align-items: center; justify-content: center;\n  font-size: 1.3rem; color: #fff;\n  box-shadow: 0 8px 28px var(--glow);\n  transition: all 0.28s;\n  animation: fabPulse 3.5s ease-in-out infinite;\n}\n.ai-fab:hover { transform: scale(1.08) rotate(5deg); }\n@keyframes fabPulse { 0%,100%{box-shadow:0 8px 28px var(--glow)} 50%{box-shadow:0 8px 44px rgba(99,102,241,0.48)} }\n.ai-tooltip {\n  position: absolute; right: 62px; top: 50%; transform: translateY(-50%);\n  background: var(--bg2); border: 1px solid var(--border);\n  border-radius: 9px; padding: 7px 13px;\n  font-size: 0.78rem; white-space: nowrap; color: var(--text);\n  opacity: 0; transition: opacity 0.2s; pointer-events: none;\n  font-family: var(--font);\n}\n.ai-fab:hover .ai-tooltip { opacity: 1; }\n\n/* ─── ANIMATIONS ─── */\n@keyframes fadeUp { from{opacity:0;transform:translateY(28px)} to{opacity:1;transform:translateY(0)} }\n.reveal { opacity: 0; transform: translateY(26px); transition: all 0.65s ease; }\n.reveal.visible { opacity: 1; transform: translateY(0); }\n\n/* ─── SCROLLBAR ─── */\n::-webkit-scrollbar { width: 5px; }\n::-webkit-scrollbar-track { background: var(--bg); }\n::-webkit-scrollbar-thumb { background: var(--accent); border-radius: 3px; }\n\n/* ─── MOBILE ─── */\n@media(max-width: 768px) {\n  .nav-links { display: none; }\n  .float-card { display: none; }\n  .footer-grid { grid-template-columns: 1fr; }\n  .arch-row { flex-wrap: wrap; justify-content: center; }\n  .arch-arrow-h, .data-flow { display: none; }\n  .arch-sub-row { gap: 10px; }\n  .cta-section { padding: 36px 22px; }\n  section { padding: 60px 5%; }\n}\n" }} />
+      <div dangerouslySetInnerHTML={{ __html: "\n\n<!-- MESH -->\n<div class=\"mesh\"></div>\n\n<!-- NAV -->\n<nav>\n  <a href=\"#\" class=\"nav-logo\">\n    <div class=\"logo-icon\">🎯</div>\n    InterviewIQ\n  </a>\n  <div class=\"nav-links\">\n    <a href=\"#features\">Features</a>\n    <a href=\"#architecture\">Architecture</a>\n    <a href=\"#how\">How It Works</a>\n    <a href=\"#faq\">FAQ</a>\n  </div>\n  <div class=\"nav-right\">\n    <button class=\"theme-btn\" id=\"themeBtn\" title=\"Toggle theme\">🌙</button>\n    <a href=\"#start\" class=\"nav-cta\">Start Free →</a>\n  </div>\n</nav>\n\n<!-- HERO -->\n<section class=\"hero\" id=\"start\">\n  <div style=\"font-size: 1rem; font-weight: 400; color: var(--text2); margin-bottom: 24px; animation: fadeUp 0.7s ease both;\">\n    🚀 India's #1 Free AI Mock Interview Platform &nbsp;•&nbsp; Powered by Gemini AI &nbsp;•&nbsp; 500+ Interview Topics &nbsp;•&nbsp; No Credit Card Required\n  </div>\n  <h1>Ace Your Next<br><span class=\"grad-text\">Interview with AI</span></h1>\n  <p class=\"hero-sub\">Practice with AI-generated mock interviews tailored to your role, get real-time voice analysis, and receive expert feedback — completely free, forever.</p>\n  <div class=\"hero-btns\">\n    <a href=\"#\" class=\"btn-primary\">🚀 Start Interview Free</a>\n    <a href=\"#how\" class=\"btn-secondary\">▶ See How It Works</a>\n  </div>\n  <div class=\"stats-bar\">\n    <div class=\"stat\">\n      <span class=\"stat-num\" data-target=\"500\">0</span><span style=\"font-size:1.7rem;font-weight:800\">+</span>\n      <br><span class=\"stat-label\">Interview Topics</span>\n    </div>\n    <div class=\"stat\">\n      <span class=\"stat-num\" data-target=\"10000\">0</span><span style=\"font-size:1.7rem;font-weight:800\">+</span>\n      <br><span class=\"stat-label\">Sessions Done</span>\n    </div>\n    <div class=\"stat\">\n      <span class=\"stat-num\" data-target=\"98\">0</span><span style=\"font-size:1.7rem;font-weight:800\">%</span>\n      <br><span class=\"stat-label\">Satisfaction Rate</span>\n    </div>\n    <div class=\"stat\">\n      <span class=\"stat-num\">₹0</span>\n      <br><span class=\"stat-label\">Forever Free</span>\n    </div>\n  </div>\n\n  <!-- HERO CARD -->\n  <div class=\"hero-visual\" style=\"position:relative;max-width:600px;\">\n    <div class=\"interview-card\">\n      <div class=\"card-header\">\n        <div class=\"card-avatar\">🤖</div>\n        <div class=\"card-meta\">\n          <h4>AI Interviewer</h4>\n          <p>Software Engineer · React · 2 Years Exp</p>\n        </div>\n      </div>\n      <div class=\"question-bubble\">\n        Explain the difference between <strong>useEffect</strong> and <strong>useLayoutEffect</strong> in React, and when would you use each?\n      </div>\n      <div class=\"answer-bubble\">\n        <div class=\"typing-indicator\"><span></span><span></span><span></span></div>\n      </div>\n      <div class=\"score-pills\">\n        <span class=\"pill pill-green\">✓ Clarity: 92%</span>\n        <span class=\"pill pill-purple\">⚡ Depth: 88%</span>\n        <span class=\"pill pill-red\">↑ Improve: Examples</span>\n      </div>\n    </div>\n    \n  </div>\n</section>\n\n<!-- COMPANIES -->\n<section style=\"padding:36px 5%;\">\n  <div class=\"companies reveal\">\n    <p>Students from top colleges &amp; companies trust us</p>\n    <div class=\"company-tags\">\n      <span class=\"company-tag\">🏢 Google</span>\n      <span class=\"company-tag\">💼 Microsoft</span>\n      <span class=\"company-tag\">🛒 Amazon</span>\n      <span class=\"company-tag\">🍎 Apple</span>\n      <span class=\"company-tag\">📘 Meta</span>\n      <span class=\"company-tag\">🟡 Flipkart</span>\n      <span class=\"company-tag\">⚡ Zepto</span>\n      <span class=\"company-tag\">🚗 Ola</span>\n      <span class=\"company-tag\">🟠 Swiggy</span>\n      <span class=\"company-tag\">💳 Razorpay</span>\n    </div>\n  </div>\n</section>\n\n<!-- FEATURES -->\n<section id=\"features\">\n  <div class=\"reveal\" style=\"text-align:center;margin-bottom:44px;\">\n    <span class=\"section-tag\">Features</span>\n    <h2 class=\"section-title\">Everything to Nail<br>the Interview</h2>\n    <p class=\"section-sub\" style=\"margin:0 auto;\">Powerful AI tools built for Indian students targeting top tech companies.</p>\n  </div>\n  <div class=\"features-grid\">\n    <div class=\"feature-card reveal\">\n      <div class=\"feature-icon icon-purple\">🤖</div>\n      <h3>AI-Generated Questions</h3>\n      <p>Role-specific questions generated in real-time by Gemini AI, tailored to your exact tech stack and experience level. No two sessions are alike.</p>\n      <span class=\"feature-tag pill-purple\">Core Feature</span>\n    </div>\n    <div class=\"feature-card reveal\">\n      <div class=\"feature-icon icon-green\">🎙️</div>\n      <h3>Voice Analysis</h3>\n      <p>Speak your answers naturally. Our speech-to-text engine captures every word and feeds it to AI for evaluation of clarity, confidence, and depth.</p>\n      <span class=\"feature-tag pill-green\">Live</span>\n    </div>\n    <div class=\"feature-card reveal\">\n      <div class=\"feature-icon icon-blue\">📊</div>\n      <h3>Smart Feedback</h3>\n      <p>Receive detailed ratings, model answers, and actionable improvement tips instantly after each session. See exactly where you need to improve.</p>\n      <span class=\"feature-tag pill-purple\">AI Powered</span>\n    </div>\n    <div class=\"feature-card reveal\">\n      <div class=\"feature-icon icon-yellow\">🎯</div>\n      <h3>Company-Specific Prep</h3>\n      <p>Practice with questions curated for FAANG, startups, and Indian tech companies. Know exactly what each company asks in real interviews.</p>\n      <span class=\"feature-tag pill-green\">500+ Companies</span>\n    </div>\n    <div class=\"feature-card reveal\">\n      <div class=\"feature-icon icon-pink\">📈</div>\n      <h3>Progress Tracking</h3>\n      <p>Track your improvement over time with detailed analytics. See your score trends, weak areas, and how you compare to other candidates.</p>\n      <span class=\"feature-tag pill-purple\">Dashboard</span>\n    </div>\n    <div class=\"feature-card reveal\">\n      <div class=\"feature-icon icon-red\">⚡</div>\n      <h3>DSA + System Design</h3>\n      <p>Practice coding rounds, system design, and behavioral interviews all in one place. Complete interview preparation under one roof.</p>\n      <span class=\"feature-tag pill-red\">Full Stack</span>\n    </div>\n  </div>\n</section>\n\n<!-- PROGRESS SHOWCASE -->\n<section style=\"padding:36px 5% 76px;\">\n  <div style=\"display:grid;grid-template-columns:1fr 1fr;gap:40px;align-items:center;max-width:900px;margin:0 auto;\" class=\"reveal\">\n    <div>\n      <span class=\"section-tag\">Your Growth</span>\n      <h2 class=\"section-title\" style=\"font-size:clamp(1.5rem,2.8vw,2.1rem);\">See Real<br>Improvement</h2>\n      <p style=\"color:var(--text2);font-size:0.92rem;line-height:1.7;margin-bottom:22px;\">\n        Track every session. Watch your confidence, clarity, and technical knowledge grow with each practice round.\n      </p>\n      <a href=\"#\" class=\"btn-primary\" style=\"display:inline-flex;\">Start Tracking →</a>\n    </div>\n    <div class=\"progress-section\">\n      <div class=\"progress-item\">\n        <div class=\"progress-header\"><span class=\"progress-label\">Communication Clarity</span><span class=\"progress-val\">92%</span></div>\n        <div class=\"progress-bar\"><div class=\"progress-fill\" style=\"width:92%\"></div></div>\n      </div>\n      <div class=\"progress-item\">\n        <div class=\"progress-header\"><span class=\"progress-label\">Technical Knowledge</span><span class=\"progress-val\">85%</span></div>\n        <div class=\"progress-bar\"><div class=\"progress-fill\" style=\"width:85%\"></div></div>\n      </div>\n      <div class=\"progress-item\">\n        <div class=\"progress-header\"><span class=\"progress-label\">Problem Solving</span><span class=\"progress-val\">78%</span></div>\n        <div class=\"progress-bar\"><div class=\"progress-fill\" style=\"width:78%\"></div></div>\n      </div>\n      <div class=\"progress-item\">\n        <div class=\"progress-header\"><span class=\"progress-label\">Confidence Score</span><span class=\"progress-val\">96%</span></div>\n        <div class=\"progress-bar\"><div class=\"progress-fill\" style=\"width:96%\"></div></div>\n      </div>\n    </div>\n  </div>\n</section>\n\n<!-- ═══════════════════════════════════════════════\n     SYSTEM ARCHITECTURE (Animated)\n═══════════════════════════════════════════════ -->\n<section class=\"arch-section\" id=\"architecture\">\n  <div class=\"reveal\" style=\"text-align:center;margin-bottom:52px;\">\n    <span class=\"section-tag\">System Architecture</span>\n    <h2 class=\"section-title\">How It All Works<br><span class=\"grad-text\">Under the Hood</span></h2>\n    <p class=\"section-sub\" style=\"margin:0 auto;\">\n      A real-time pipeline — from your input to AI-powered feedback — all in seconds.\n    </p>\n  </div>\n\n  <div class=\"arch-diagram reveal\">\n\n    <!-- ROW 1: User -->\n    <div class=\"arch-row center\">\n      <div class=\"arch-node accent-node\" style=\"animation-delay:0.1s\">\n        <div class=\"arch-node-icon\">👤</div>\n        <div class=\"arch-node-title\">User</div>\n        <div class=\"arch-node-sub\">Selects role, stack &amp; experience</div>\n      </div>\n    </div>\n\n    <!-- Connector down -->\n    <div style=\"display:flex;flex-direction:column;align-items:center;gap:0;\">\n      <div class=\"arch-arrow-v\"></div>\n      <div class=\"flow-label\">Profile Input</div>\n      <div class=\"arch-arrow-v\"></div>\n    </div>\n\n    <!-- ROW 2: Frontend -->\n    <div class=\"arch-row center\">\n      <div class=\"arch-node\" style=\"animation-delay:0.2s\">\n        <div class=\"arch-node-icon\">🌐</div>\n        <div class=\"arch-node-title\">Frontend App</div>\n        <div class=\"arch-node-sub\">HTML · CSS · JS<br>Speech-to-Text API</div>\n      </div>\n    </div>\n\n    <!-- Connector down -->\n    <div style=\"display:flex;flex-direction:column;align-items:center;gap:0;\">\n      <div class=\"arch-arrow-v\"></div>\n      <div class=\"flow-label\">API Request</div>\n      <div class=\"arch-arrow-v\"></div>\n    </div>\n\n    <!-- ROW 3: Core Engine (central) -->\n    <div class=\"arch-row\" style=\"justify-content:center;gap:20px;\">\n      <!-- Left branch -->\n      <div class=\"arch-node\" style=\"min-width:148px;animation-delay:0.3s\">\n        <div class=\"arch-node-icon\">🗄️</div>\n        <div class=\"arch-node-title\">Question DB</div>\n        <div class=\"arch-node-sub\">500+ Topics<br>Company Patterns</div>\n      </div>\n\n      <div class=\"data-flow\" style=\"flex:0 0 50px;\">\n        <div class=\"data-flow-line\"></div>\n        <div class=\"data-dot\"></div>\n      </div>\n\n      <!-- Central AI -->\n      <div class=\"arch-node central\" style=\"animation-delay:0.35s\">\n        <div class=\"arch-node-icon\">🤖</div>\n        <div class=\"arch-node-title\" style=\"font-size:0.95rem\">Gemini AI Engine</div>\n        <div class=\"arch-node-sub\">Question Generation<br>Answer Evaluation<br>Score Calculation</div>\n      </div>\n\n      <div class=\"data-flow\" style=\"flex:0 0 50px;\">\n        <div class=\"data-flow-line\"></div>\n        <div class=\"data-dot\" style=\"animation-delay:0.5s\"></div>\n      </div>\n\n      <!-- Right branch -->\n      <div class=\"arch-node\" style=\"min-width:148px;animation-delay:0.3s\">\n        <div class=\"arch-node-icon\">📊</div>\n        <div class=\"arch-node-title\">Analytics Engine</div>\n        <div class=\"arch-node-sub\">Score Trends<br>Weak Area Detection</div>\n      </div>\n    </div>\n\n    <!-- Connector down -->\n    <div style=\"display:flex;flex-direction:column;align-items:center;\">\n      <div class=\"arch-arrow-v\"></div>\n      <div class=\"flow-label\">Processed Output</div>\n      <div class=\"arch-arrow-v\"></div>\n    </div>\n\n    <!-- ROW 4: Output modules -->\n    <div class=\"arch-sub-row reveal\" style=\"animation-delay:0.5s\">\n      <div class=\"arch-sub-node\">\n        <div class=\"arch-sub-node-icon\">💬</div>\n        <div class=\"arch-sub-node-title\">Instant Feedback</div>\n        <div class=\"arch-sub-node-sub\">Scores + Tips</div>\n      </div>\n      <div class=\"arch-sub-node\">\n        <div class=\"arch-sub-node-icon\">✍️</div>\n        <div class=\"arch-sub-node-title\">Model Answers</div>\n        <div class=\"arch-sub-node-sub\">AI Best Response</div>\n      </div>\n      <div class=\"arch-sub-node\">\n        <div class=\"arch-sub-node-icon\">📈</div>\n        <div class=\"arch-sub-node-title\">Progress Report</div>\n        <div class=\"arch-sub-node-sub\">Session History</div>\n      </div>\n      <div class=\"arch-sub-node\">\n        <div class=\"arch-sub-node-icon\">🎯</div>\n        <div class=\"arch-sub-node-title\">ATS Score</div>\n        <div class=\"arch-sub-node-sub\">Resume Match %</div>\n      </div>\n    </div>\n\n    <!-- Connector down -->\n    <div style=\"display:flex;flex-direction:column;align-items:center;\">\n      <div class=\"arch-arrow-v\" style=\"height:28px;\"></div>\n    </div>\n\n    <!-- ROW 5: User Dashboard -->\n    <div class=\"arch-row center\">\n      <div class=\"arch-node accent-node\" style=\"animation-delay:0.6s\">\n        <div class=\"arch-node-icon\">🏆</div>\n        <div class=\"arch-node-title\">User Dashboard</div>\n        <div class=\"arch-node-sub\">Growth Tracking · Interview Ready Score</div>\n      </div>\n    </div>\n\n  </div>\n\n  <!-- Tech stack chips -->\n  <div class=\"reveal\" style=\"text-align:center;margin-top:44px;\">\n    <p style=\"font-size:0.76rem;color:var(--text2);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:14px;\">Tech Stack</p>\n    <div style=\"display:flex;gap:8px;flex-wrap:wrap;justify-content:center;\">\n      <span class=\"company-tag\" style=\"font-size:0.78rem;padding:7px 14px;\">HTML · CSS · JS</span>\n      <span class=\"company-tag\" style=\"font-size:0.78rem;padding:7px 14px;\">Gemini AI API</span>\n      <span class=\"company-tag\" style=\"font-size:0.78rem;padding:7px 14px;\">Web Speech API</span>\n      <span class=\"company-tag\" style=\"font-size:0.78rem;padding:7px 14px;\">REST APIs</span>\n      <span class=\"company-tag\" style=\"font-size:0.78rem;padding:7px 14px;\">LocalStorage</span>\n      <span class=\"company-tag\" style=\"font-size:0.78rem;padding:7px 14px;\">Responsive Design</span>\n    </div>\n  </div>\n</section>\n\n<!-- HOW IT WORKS -->\n<section id=\"how\">\n  <div class=\"reveal\" style=\"text-align:center;margin-bottom:44px;\">\n    <span class=\"section-tag\">Process</span>\n    <h2 class=\"section-title\">From Zero to<br>Interview Ready</h2>\n    <p class=\"section-sub\" style=\"margin:0 auto;\">5 simple steps to land your dream job.</p>\n  </div>\n  <div class=\"how-container\">\n    <div class=\"step reveal\">\n      <div class=\"step-num\">01</div>\n      <div class=\"step-content\">\n        <h3>Set Your Profile</h3>\n        <p>Enter your target role, preferred tech stack, and years of experience. AI customizes everything to your exact profile — no two sessions are alike.</p>\n      </div>\n    </div>\n    <div class=\"step reveal\">\n      <div class=\"step-num\">02</div>\n      <div class=\"step-content\">\n        <h3>Get AI Questions</h3>\n        <p>Gemini AI generates 5 unique, role-specific questions in seconds. Behavioral, technical, DSA, and system design — all in one session.</p>\n      </div>\n    </div>\n    <div class=\"step reveal\">\n      <div class=\"step-num\">03</div>\n      <div class=\"step-content\">\n        <h3>Answer with Voice</h3>\n        <p>Speak your answers naturally. Real-time speech-to-text captures everything. Just like a real interview — practice makes perfect.</p>\n      </div>\n    </div>\n    <div class=\"step reveal\">\n      <div class=\"step-num\">04</div>\n      <div class=\"step-content\">\n        <h3>Get Instant Feedback</h3>\n        <p>AI analyzes your answer for clarity, depth, and accuracy. Get a score, model answer, and specific tips to improve — all in seconds.</p>\n      </div>\n    </div>\n    <div class=\"step reveal\">\n      <div class=\"step-num\">05</div>\n      <div class=\"step-content\">\n        <h3>Track &amp; Improve</h3>\n        <p>See your progress over time on the dashboard. Identify weak areas, celebrate wins, and know exactly when you're ready to apply.</p>\n      </div>\n    </div>\n  </div>\n</section>\n\n<!-- COUNTER STATS -->\n<section style=\"padding:36px 5% 76px;\">\n  <div class=\"counter-section reveal\">\n    <div>\n      <span class=\"counter-num\" data-count=\"500\">0</span>\n      <div class=\"counter-label\">Interview Topics</div>\n    </div>\n    <div>\n      <span class=\"counter-num\" data-count=\"10000\">0</span>\n      <div class=\"counter-label\">Interviews Practiced</div>\n    </div>\n    <div>\n      <span class=\"counter-num\" data-count=\"98\">0</span>\n      <div class=\"counter-label\">% Satisfaction Rate</div>\n    </div>\n    <div>\n      <span class=\"counter-num\">₹0</span>\n      <div class=\"counter-label\">Cost — Forever</div>\n    </div>\n  </div>\n</section>\n\n<!-- FAQ -->\n<section id=\"faq\">\n  <div class=\"reveal\" style=\"text-align:center;margin-bottom:44px;\">\n    <span class=\"section-tag\">FAQ</span>\n    <h2 class=\"section-title\">Got Questions?</h2>\n  </div>\n  <div class=\"faq-list\">\n    <div class=\"faq-item reveal\">\n      <div class=\"faq-q\">How does the AI mock interview work? <div class=\"faq-icon\">+</div></div>\n      <div class=\"faq-a\">Enter your job role, tech stack, and experience level. Gemini AI generates personalized questions, you answer via voice or text, and AI gives you instant detailed feedback with scores and model answers.</div>\n    </div>\n    <div class=\"faq-item reveal\">\n      <div class=\"faq-q\">Is this completely free? <div class=\"faq-icon\">+</div></div>\n      <div class=\"faq-a\">Yes! InterviewIQ is 100% free — no credit card, no hidden fees, no subscription. You get 5 AI questions per session, completely free, forever.</div>\n    </div>\n    <div class=\"faq-item reveal\">\n      <div class=\"faq-q\">Which companies' interview patterns are covered? <div class=\"faq-icon\">+</div></div>\n      <div class=\"faq-a\">We cover FAANG (Google, Meta, Amazon, Apple, Netflix), top Indian companies (Flipkart, Zepto, Swiggy, Razorpay, Ola), and 500+ other tech companies across roles.</div>\n    </div>\n    <div class=\"faq-item reveal\">\n      <div class=\"faq-q\">Can I practice DSA and System Design? <div class=\"faq-icon\">+</div></div>\n      <div class=\"faq-a\">Absolutely! InterviewIQ covers behavioral interviews, technical deep-dives, DSA problem-solving, system design, and HR rounds — complete interview preparation.</div>\n    </div>\n    <div class=\"faq-item reveal\">\n      <div class=\"faq-q\">How is this different from other platforms? <div class=\"faq-icon\">+</div></div>\n      <div class=\"faq-a\">Unlike most platforms, we're completely free, India-focused, powered by Gemini AI, and offer voice analysis + real-time feedback. No templates — every session is uniquely generated for your profile.</div>\n    </div>\n  </div>\n</section>\n\n<!-- CTA -->\n<section style=\"padding:36px 5% 80px;\">\n  <div class=\"cta-section reveal\">\n    <h2>Ready to Land Your<br><span class=\"grad-text\">Dream Job?</span></h2>\n    <p>Join thousands of Indian students who cracked FAANG and top startups using InterviewIQ. Start your free session now.</p>\n    <div class=\"cta-btns\">\n      <a href=\"#\" class=\"btn-primary\">🚀 Start Free Interview</a>\n      <a href=\"#\" class=\"btn-secondary\">📊 View Dashboard</a>\n    </div>\n    <div class=\"free-badge\">\n      100% Free <span>·</span> No Signup Required <span>·</span> Instant Access\n    </div>\n  </div>\n</section>\n\n<!-- FOOTER -->\n<footer>\n  <div class=\"footer-grid\">\n    <div class=\"footer-brand\">\n      <h3>🎯 InterviewIQ</h3>\n      <p>India's #1 free AI mock interview platform. Built for students targeting FAANG, startups, and top tech companies. Powered by Gemini AI.</p>\n      <!-- Social Links with proper SVG icons (Bug Fix) -->\n      <div class=\"social-links\">\n\n        <!-- LinkedIn -->\n        <a href=\"https://linkedin.com/in/prashant-kumar-singh-51b225230\" class=\"social-link soc-linkedin\" target=\"_blank\" title=\"LinkedIn\">\n          <svg viewBox=\"0 0 24 24\" xmlns=\"http://www.w3.org/2000/svg\">\n            <path d=\"M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z\"/>\n          </svg>\n        </a>\n\n        <!-- GitHub -->\n        <a href=\"https://github.com/PrashantSinghUP64\" class=\"social-link soc-github\" target=\"_blank\" title=\"GitHub\">\n          <svg viewBox=\"0 0 24 24\" xmlns=\"http://www.w3.org/2000/svg\">\n            <path d=\"M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12\"/>\n          </svg>\n        </a>\n\n        <!-- Twitter/X -->\n        <a href=\"https://x.com/prashant_UP_64\" class=\"social-link soc-twitter\" target=\"_blank\" title=\"Twitter / X\">\n          <svg viewBox=\"0 0 24 24\" xmlns=\"http://www.w3.org/2000/svg\">\n            <path d=\"M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z\"/>\n          </svg>\n        </a>\n\n        <!-- YouTube -->\n        <a href=\"https://www.youtube.com/@technicalknowledgehindi1949\" class=\"social-link soc-youtube\" target=\"_blank\" title=\"YouTube\">\n          <svg viewBox=\"0 0 24 24\" xmlns=\"http://www.w3.org/2000/svg\">\n            <path d=\"M23.498 6.186a3.016 3.016 0 00-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 00.502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 002.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 002.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z\"/>\n          </svg>\n        </a>\n\n        <!-- Email -->\n        <a href=\"mailto:ps7027804@gmail.com\" class=\"social-link soc-email\" title=\"Email\">\n          <svg viewBox=\"0 0 24 24\" xmlns=\"http://www.w3.org/2000/svg\">\n            <path d=\"M24 5.457v13.909c0 .904-.732 1.636-1.636 1.636h-3.819V11.73L12 16.64l-6.545-4.91v9.273H1.636A1.636 1.636 0 010 19.366V5.457c0-2.023 2.309-3.178 3.927-1.964L5.455 4.64 12 9.548l6.545-4.907 1.528-1.148C21.69 2.28 24 3.434 24 5.457z\"/>\n          </svg>\n        </a>\n\n        <!-- Linktree -->\n        <a href=\"https://linktr.ee/Prashantsingh64\" class=\"social-link soc-link\" target=\"_blank\" title=\"All Links\">\n          <svg viewBox=\"0 0 24 24\" xmlns=\"http://www.w3.org/2000/svg\">\n            <path d=\"M13.511 5.853l4.005-4.02 2.12 2.136-4.02 4.004h5.767v3.019h-5.781l4.034 4.005-2.12 2.136-5.515-5.533-5.516 5.533-2.12-2.136 4.034-4.005H2.618V7.973h5.767L4.365 3.969l2.12-2.136 4.005 4.02V0h3.021v5.853zM10.49 16.178h3.021V24H10.49v-7.822z\"/>\n          </svg>\n        </a>\n\n      </div>\n    </div>\n    <div class=\"footer-links\">\n      <h4>Product</h4>\n      <a href=\"#\">Dashboard</a>\n      <a href=\"#features\">Features</a>\n      <a href=\"#architecture\">Architecture</a>\n      <a href=\"#how\">How It Works</a>\n      <a href=\"#faq\">FAQ</a>\n    </div>\n    <div class=\"footer-links\">\n      <h4>Connect</h4>\n      <a href=\"https://linkedin.com/in/prashant-kumar-singh-51b225230\" target=\"_blank\">LinkedIn</a>\n      <a href=\"https://github.com/PrashantSinghUP64\" target=\"_blank\">GitHub</a>\n      <a href=\"https://www.youtube.com/@technicalknowledgehindi1949\" target=\"_blank\">YouTube</a>\n      <a href=\"https://linktr.ee/Prashantsingh64\" target=\"_blank\">All Links</a>\n      <a href=\"mailto:ps7027804@gmail.com\">Email Me</a>\n    </div>\n  </div>\n  <div class=\"footer-bottom\">\n    <p>© 2026 InterviewIQ. All rights reserved. 🇮🇳 Made in India</p>\n    <p class=\"built-by\">Built by <a href=\"https://linkedin.com/in/prashant-kumar-singh-51b225230\" target=\"_blank\">Prashant Kumar Singh</a> · B.Tech CSE (AI/ML)</p>\n  </div>\n</footer>\n\n\n\n" }} />
+    </>
   );
-};
-
-export default Page;
+}

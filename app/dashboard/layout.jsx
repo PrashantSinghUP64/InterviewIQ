@@ -3,7 +3,7 @@ import Header from './_components/Header'
 
 const layout = ({ children }) => {
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100">
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100">
       <Header />
       <div className="mx-5 md:mx-20 lg:mx-36 py-6">
         {children}

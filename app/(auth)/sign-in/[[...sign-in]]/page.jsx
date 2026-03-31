@@ -40,7 +40,8 @@ export default function Page() {
         border: none !important;
       }
       .cl-headerTitle, .cl-headerSubtitle { display: none !important; }
-      .cl-socialButtonsBlockButton {
+      
+      .dark .cl-socialButtonsBlockButton {
         background: rgb(30 41 59 / 0.8) !important;
         border: 1px solid rgb(100 116 139 / 0.35) !important;
         border-radius: 12px !important;
@@ -49,12 +50,13 @@ export default function Page() {
         height: 48px !important;
         transition: all 0.2s ease;
       }
-      .cl-socialButtonsBlockButton:hover {
+      .dark .cl-socialButtonsBlockButton:hover {
         background: rgb(99 102 241 / 0.15) !important;
         border-color: rgb(99 102 241 / 0.5) !important;
       }
-      .cl-socialButtonsBlockButtonText { color: #e2e8f0 !important; }
-      .cl-formFieldInput {
+      .dark .cl-socialButtonsBlockButtonText { color: #e2e8f0 !important; }
+      
+      .dark .cl-formFieldInput {
         background: rgb(30 41 59 / 0.8) !important;
         border: 1px solid rgb(100 116 139 / 0.35) !important;
         border-radius: 12px !important;
@@ -63,13 +65,14 @@ export default function Page() {
         padding: 12px 16px !important;
         transition: all 0.2s ease;
       }
-      .cl-formFieldInput:focus {
+      .dark .cl-formFieldInput:focus {
         border-color: rgb(99 102 241 / 0.6) !important;
         box-shadow: 0 0 0 3px rgb(99 102 241 / 0.15) !important;
         outline: none !important;
       }
-      .cl-formFieldInput::placeholder { color: #64748b !important; }
-      .cl-formFieldLabel { color: #94a3b8 !important; font-size: 12px !important; font-weight: 600 !important; text-transform: uppercase !important; letter-spacing: 0.05em !important; }
+      .dark .cl-formFieldInput::placeholder { color: #64748b !important; }
+      .dark .cl-formFieldLabel { color: #94a3b8 !important; font-size: 12px !important; font-weight: 600 !important; text-transform: uppercase !important; letter-spacing: 0.05em !important; }
+      
       .cl-formButtonPrimary {
         background: linear-gradient(135deg, #4f46e5, #7c3aed) !important;
         border-radius: 12px !important;
@@ -83,28 +86,29 @@ export default function Page() {
         box-shadow: 0 6px 20px rgba(99,102,241,0.5) !important;
         transform: translateY(-1px) !important;
       }
-      .cl-dividerLine { background: rgb(100 116 139 / 0.2) !important; }
-      .cl-dividerText { color: #475569 !important; background: transparent !important; }
-      .cl-footerActionText { color: #64748b !important; }
-      .cl-footerActionLink { color: #818cf8 !important; font-weight: 600 !important; }
-      .cl-footerActionLink:hover { color: #a5b4fc !important; text-decoration: underline !important; }
-      .cl-identityPreviewText { color: #e2e8f0 !important; }
-      .cl-identityPreviewEditButtonIcon { color: #818cf8 !important; }
-      .cl-formFieldError { color: #f87171 !important; }
-      .cl-otpCodeFieldInput {
+      
+      .dark .cl-dividerLine { background: rgb(100 116 139 / 0.2) !important; }
+      .dark .cl-dividerText { color: #475569 !important; background: transparent !important; }
+      .dark .cl-footerActionText { color: #64748b !important; }
+      .dark .cl-footerActionLink { color: #818cf8 !important; font-weight: 600 !important; }
+      .dark .cl-footerActionLink:hover { color: #a5b4fc !important; text-decoration: underline !important; }
+      .dark .cl-identityPreviewText { color: #e2e8f0 !important; }
+      .dark .cl-identityPreviewEditButtonIcon { color: #818cf8 !important; }
+      .dark .cl-formFieldError { color: #f87171 !important; }
+      .dark .cl-otpCodeFieldInput {
         background: rgb(30 41 59 / 0.8) !important;
         border: 1px solid rgb(100 116 139 / 0.35) !important;
         border-radius: 10px !important;
         color: #e2e8f0 !important;
       }
-      .cl-alertText { color: #f87171 !important; }
+      .dark .cl-alertText { color: #f87171 !important; }
     `
     document.head.appendChild(style)
     return () => document.head.removeChild(style)
   }, [])
 
   return (
-    <div className="min-h-screen bg-slate-950 text-white flex">
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-white flex">
       {/* ── Left Panel ─────────────────────────────── */}
       <div className="hidden lg:flex lg:w-5/12 xl:w-1/2 relative overflow-hidden flex-col justify-between p-12">
         {/* Background glow orbs */}
@@ -118,7 +122,7 @@ export default function Page() {
             <Sparkles className="w-4 h-4 text-indigo-400" />
           </div>
           <span className="text-xl font-bold bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text text-transparent">
-            Let's Prepare
+            InterviewIQ
           </span>
         </div>
 
@@ -137,7 +141,7 @@ export default function Page() {
                 Interview with AI
               </span>
             </h1>
-            <p className="mt-4 text-slate-400 leading-relaxed max-w-sm">
+            <p className="mt-4 text-slate-600 dark:text-slate-400 leading-relaxed max-w-sm">
               Practice with real AI-generated questions, speak your answers, and get detailed scoring — all in one place.
             </p>
           </div>
@@ -150,7 +154,7 @@ export default function Page() {
                   <Icon className={`w-4.5 h-4.5 ${color}`} />
                 </div>
                 <div>
-                  <p className="text-sm font-semibold text-slate-200">{title}</p>
+                  <p className="text-sm font-semibold text-slate-800 dark:text-slate-200">{title}</p>
                   <p className="text-xs text-slate-500 mt-0.5">{desc}</p>
                 </div>
               </div>
@@ -164,8 +168,8 @@ export default function Page() {
                 <Star key={i} className="w-4 h-4 text-amber-400 fill-amber-400" />
               ))}
             </div>
-            <p className="text-sm text-slate-400">
-              <span className="text-slate-200 font-semibold">10,000+</span> interviews practised
+            <p className="text-sm text-slate-600 dark:text-slate-400">
+              <span className="text-slate-800 dark:text-slate-200 font-semibold">10,000+</span> interviews practised
             </p>
           </div>
         </div>
@@ -186,18 +190,18 @@ export default function Page() {
               <Sparkles className="w-4 h-4 text-indigo-400" />
             </div>
             <span className="text-lg font-bold bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text text-transparent">
-              Let's Prepare
+              InterviewIQ
             </span>
           </div>
 
           {/* Heading */}
           <div className="text-center mb-8">
-            <h2 className="text-2xl font-bold text-slate-100">Welcome back</h2>
+            <h2 className="text-2xl font-bold text-slate-900 dark:text-slate-100">Welcome back</h2>
             <p className="text-slate-500 text-sm mt-2">Sign in to continue your interview practice</p>
           </div>
 
           {/* Clerk Card wrapper */}
-          <div className="rounded-2xl bg-slate-900/60 border border-slate-800 p-6 shadow-2xl shadow-black/40">
+          <div className="rounded-2xl bg-white/60 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 p-6 shadow-2xl shadow-black/40">
             <SignIn redirectUrl="/dashboard" />
           </div>
 

@@ -36,3 +36,29 @@ You can check out [the Next.js GitHub repository](https://github.com/vercel/next
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+
+## Environment Variables Setup
+
+Create a `.env.local` file in the root of your project and add the following keys. Refer to `.env.example` for the format.
+
+**Har key kahan se milegi (Where to get each key):**
+
+**1. Gemini API Key** — Free
+- aistudio.google.com pe jaao
+- "Get API Key" click karo
+- "Create API Key" 
+- Copy karo and assign it to `NEXT_PUBLIC_GEMINI_API_KEY`
+
+**2. Clerk Keys** — Free
+- clerk.com pe jaao
+- New Application banao
+- "InterviewIQ" naam do
+- Google login enable karo
+- Dashboard → API Keys
+- Publishable Key + Secret Key copy karo
+
+**3. Neon DB URL** — Free
+- neon.tech pe jaao
+- New Project → "interviewiq-db"
+- Dashboard → Connection String
+- Copy karo (postgresql://... wala) and assign it to `NEXT_PUBLIC_DRIZZLE_DB_URL`

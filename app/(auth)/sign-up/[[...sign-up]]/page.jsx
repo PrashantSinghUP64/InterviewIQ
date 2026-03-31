@@ -94,7 +94,7 @@ export default function Page() {
   }, [])
 
   return (
-    <div className="min-h-screen bg-slate-950 text-white flex">
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-white flex">
       {/* ── Left Panel ─────────────────────────────── */}
       <div className="hidden lg:flex lg:w-5/12 xl:w-1/2 relative overflow-hidden flex-col justify-between p-12">
         <div className="absolute top-1/4 left-1/4 w-[350px] h-[350px] bg-indigo-600/15 rounded-full blur-[100px] pointer-events-none" />
@@ -106,7 +106,7 @@ export default function Page() {
             <Sparkles className="w-4 h-4 text-indigo-400" />
           </div>
           <span className="text-xl font-bold bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text text-transparent">
-            Let's Prepare
+            InterviewIQ
           </span>
         </div>
 
@@ -124,7 +124,7 @@ export default function Page() {
                 to Interview Success
               </span>
             </h1>
-            <p className="mt-4 text-slate-400 leading-relaxed max-w-sm">
+            <p className="mt-4 text-slate-600 dark:text-slate-400 leading-relaxed max-w-sm">
               Join thousands of candidates who've already improved their interview skills with AI-powered practice.
             </p>
           </div>
@@ -136,7 +136,7 @@ export default function Page() {
                   <Icon className={`w-4.5 h-4.5 ${color}`} />
                 </div>
                 <div>
-                  <p className="text-sm font-semibold text-slate-200">{title}</p>
+                  <p className="text-sm font-semibold text-slate-800 dark:text-slate-200">{title}</p>
                   <p className="text-xs text-slate-500 mt-0.5">{desc}</p>
                 </div>
               </div>
@@ -149,8 +149,8 @@ export default function Page() {
                 <Star key={i} className="w-4 h-4 text-amber-400 fill-amber-400" />
               ))}
             </div>
-            <p className="text-sm text-slate-400">
-              <span className="text-slate-200 font-semibold">10,000+</span> interviews practised
+            <p className="text-sm text-slate-600 dark:text-slate-400">
+              <span className="text-slate-800 dark:text-slate-200 font-semibold">10,000+</span> interviews practised
             </p>
           </div>
         </div>
@@ -168,16 +168,16 @@ export default function Page() {
               <Sparkles className="w-4 h-4 text-indigo-400" />
             </div>
             <span className="text-lg font-bold bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text text-transparent">
-              Let's Prepare
+              InterviewIQ
             </span>
           </div>
 
           <div className="text-center mb-8">
-            <h2 className="text-2xl font-bold text-slate-100">Create your account</h2>
+            <h2 className="text-2xl font-bold text-slate-900 dark:text-slate-100">Create your account</h2>
             <p className="text-slate-500 text-sm mt-2">Start practising interviews for free today</p>
           </div>
 
-          <div className="rounded-2xl bg-slate-900/60 border border-slate-800 p-6 shadow-2xl shadow-black/40">
+          <div className="rounded-2xl bg-white/60 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 p-6 shadow-2xl shadow-black/40">
             <SignUp redirectUrl="/dashboard" />
           </div>
 

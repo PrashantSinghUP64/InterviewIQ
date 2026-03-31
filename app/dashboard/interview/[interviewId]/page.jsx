@@ -55,26 +55,26 @@ const InterviewPage = () => {
     <div className="py-6 max-w-5xl mx-auto">
       {/* Page title */}
       <div className="mb-8">
-        <h1 className="text-2xl md:text-3xl font-bold text-slate-100">Interview Setup</h1>
-        <p className="text-slate-400 text-sm mt-1">Review your interview details and enable your camera to begin.</p>
+        <h1 className="text-2xl md:text-3xl font-bold text-slate-900 dark:text-slate-100">Interview Setup</h1>
+        <p className="text-slate-600 dark:text-slate-400 text-sm mt-1">Review your interview details and enable your camera to begin.</p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* ── Left: Details + Info ─────────────────── */}
         <div className="flex flex-col gap-5">
           {/* Interview Details Card */}
-          <div className="rounded-2xl bg-slate-900/60 border border-slate-800 p-5 space-y-4">
-            <h2 className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Session Details</h2>
+          <div className="rounded-2xl bg-white/60 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 p-5 space-y-4">
+            <h2 className="text-xs font-semibold text-slate-600 dark:text-slate-400 uppercase tracking-wider">Session Details</h2>
             <div className="space-y-3">
               {detailItems.map(({ icon: Icon, label, value }) => (
                 value && (
                   <div key={label} className="flex items-start gap-3">
-                    <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-slate-800 border border-slate-700 shrink-0 mt-0.5">
+                    <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-slate-100 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 shrink-0 mt-0.5">
                       <Icon className="w-3.5 h-3.5 text-indigo-400" />
                     </div>
                     <div>
                       <p className="text-xs text-slate-500">{label}</p>
-                      <p className="text-sm font-medium text-slate-200 mt-0.5">{value}</p>
+                      <p className="text-sm font-medium text-slate-800 dark:text-slate-200 mt-0.5">{value}</p>
                     </div>
                   </div>
                 )
@@ -90,18 +90,18 @@ const InterviewPage = () => {
               </div>
               <span className="text-sm font-semibold text-amber-400">Before You Start</span>
             </div>
-            <ul className="space-y-2 text-sm text-slate-400">
+            <ul className="space-y-2 text-sm text-slate-600 dark:text-slate-400">
               <li className="flex items-start gap-2">
                 <span className="text-amber-500 mt-0.5">•</span>
-                Enable your <span className="text-slate-200 font-medium">webcam & microphone</span> to begin the AI mock interview.
+                Enable your <span className="text-slate-800 dark:text-slate-200 font-medium">webcam & microphone</span> to begin the AI mock interview.
               </li>
               <li className="flex items-start gap-2">
                 <span className="text-amber-500 mt-0.5">•</span>
-                You'll answer <span className="text-slate-200 font-medium">5 AI-generated questions</span>. A detailed report follows.
+                You'll answer <span className="text-slate-800 dark:text-slate-200 font-medium">5 AI-generated questions</span>. A detailed report follows.
               </li>
               <li className="flex items-start gap-2">
                 <span className="text-amber-500 mt-0.5">•</span>
-                <span className="text-slate-400 italic">We never record or store your video.</span>
+                <span className="text-slate-600 dark:text-slate-400 italic">We never record or store your video.</span>
               </li>
             </ul>
           </div>
@@ -109,7 +109,7 @@ const InterviewPage = () => {
 
         {/* ── Right: Camera ────────────────────────── */}
         <div className="flex flex-col gap-4">
-          <div className="relative w-full aspect-video rounded-2xl bg-slate-900/60 border border-slate-800 overflow-hidden flex items-center justify-center">
+          <div className="relative w-full aspect-video rounded-2xl bg-white/60 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 overflow-hidden flex items-center justify-center">
             {permissionGranted ? (
               <>
                 <Webcam
@@ -130,11 +130,11 @@ const InterviewPage = () => {
               </>
             ) : (
               <div className="flex flex-col items-center gap-4 text-center p-6">
-                <div className="flex items-center justify-center w-16 h-16 rounded-2xl bg-slate-800 border border-slate-700">
+                <div className="flex items-center justify-center w-16 h-16 rounded-2xl bg-slate-100 dark:bg-slate-800 border border-slate-300 dark:border-slate-700">
                   <WebcamIcon className="w-8 h-8 text-slate-500" />
                 </div>
                 <div>
-                  <p className="text-slate-300 font-medium">Camera Disabled</p>
+                  <p className="text-slate-700 dark:text-slate-300 font-medium">Camera Disabled</p>
                   <p className="text-slate-500 text-sm mt-1">Click below to grant access</p>
                 </div>
               </div>
@@ -148,7 +148,7 @@ const InterviewPage = () => {
             className={`w-full flex items-center justify-center gap-2 py-3 rounded-xl text-sm font-semibold transition-all duration-200 border ${
               permissionGranted
                 ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-400 cursor-default'
-                : 'bg-slate-800/60 border-slate-700 text-slate-300 hover:bg-indigo-600/10 hover:border-indigo-500/40 hover:text-indigo-300'
+                : 'bg-slate-100/60 dark:bg-slate-800/60 border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-indigo-600/10 hover:border-indigo-500/40 hover:text-indigo-300'
             }`}
             disabled={permissionGranted}
           >
@@ -182,7 +182,7 @@ const InterviewPage = () => {
         ) : (
           <button
             disabled
-            className="flex items-center gap-2 px-8 py-3.5 rounded-xl text-sm font-semibold text-slate-500 bg-slate-800/60 border border-slate-700 cursor-not-allowed"
+            className="flex items-center gap-2 px-8 py-3.5 rounded-xl text-sm font-semibold text-slate-500 bg-slate-100/60 dark:bg-slate-800/60 border border-slate-300 dark:border-slate-700 cursor-not-allowed"
           >
             Start Interview
             <ArrowRight className="w-4 h-4" />

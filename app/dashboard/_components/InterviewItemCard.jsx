@@ -45,7 +45,7 @@ const InterviewItemCard = ({ interview }) => {
   return (
     <>
       {/* ── Card ─────────────────────────────────────── */}
-      <div className="group relative flex flex-col gap-4 p-5 rounded-2xl bg-slate-900/60 border border-slate-800 hover:border-slate-700 transition-all duration-300 hover:shadow-xl hover:shadow-black/30 hover:-translate-y-0.5">
+      <div className="group relative flex flex-col gap-4 p-5 rounded-2xl bg-white/60 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:border-slate-700 transition-all duration-300 hover:shadow-xl hover:shadow-black/30 hover:-translate-y-0.5">
         {/* Delete button */}
         <button
           id={`delete-interview-${interview?.mockId}`}
@@ -63,7 +63,7 @@ const InterviewItemCard = ({ interview }) => {
               <Briefcase className="w-4 h-4 text-indigo-400" />
             </div>
             <div>
-              <h2 className="font-semibold text-slate-100 leading-tight line-clamp-1">
+              <h2 className="font-semibold text-slate-900 dark:text-slate-100 leading-tight line-clamp-1">
                 {interview?.jobPosition}
               </h2>
               <p className="text-xs text-slate-500 mt-0.5">
@@ -88,14 +88,14 @@ const InterviewItemCard = ({ interview }) => {
         </div>
 
         {/* Divider */}
-        <div className="h-px bg-slate-800" />
+        <div className="h-px bg-slate-100 dark:bg-slate-800" />
 
         {/* Action buttons */}
         <div className="flex gap-2">
           <button
             id={`feedback-btn-${interview?.mockId}`}
             onClick={onFeedbackPress}
-            className="flex-1 flex items-center justify-center gap-1.5 py-2 px-3 rounded-xl text-xs font-semibold text-slate-400 border border-slate-700 hover:border-slate-600 hover:text-slate-200 hover:bg-slate-800/60 transition-all duration-200"
+            className="flex-1 flex items-center justify-center gap-1.5 py-2 px-3 rounded-xl text-xs font-semibold text-slate-600 dark:text-slate-400 border border-slate-300 dark:border-slate-700 hover:border-slate-400 dark:border-slate-600 hover:text-slate-800 dark:text-slate-200 hover:bg-slate-100/60 dark:bg-slate-800/60 transition-all duration-200"
           >
             <BarChart2 className="w-3.5 h-3.5" />
             Feedback
@@ -114,22 +114,22 @@ const InterviewItemCard = ({ interview }) => {
       {/* ── Delete Confirmation Modal ─────────────────── */}
       {isDialogOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4">
-          <div className="bg-slate-900 border border-slate-700 rounded-2xl shadow-2xl max-w-sm w-full p-6">
+          <div className="bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-2xl shadow-2xl max-w-sm w-full p-6">
             <div className="flex items-center gap-3 mb-4">
               <div className="flex items-center justify-center w-10 h-10 rounded-xl bg-red-500/15 border border-red-500/30">
                 <AlertTriangle className="w-5 h-5 text-red-400" />
               </div>
-              <h3 className="text-lg font-bold text-slate-100">Delete Interview?</h3>
+              <h3 className="text-lg font-bold text-slate-900 dark:text-slate-100">Delete Interview?</h3>
             </div>
-            <p className="text-slate-400 text-sm mb-6">
+            <p className="text-slate-600 dark:text-slate-400 text-sm mb-6">
               This will permanently remove{' '}
-              <span className="text-slate-200 font-medium">"{interview?.jobPosition}"</span> and all its feedback. This action cannot be undone.
+              <span className="text-slate-800 dark:text-slate-200 font-medium">"{interview?.jobPosition}"</span> and all its feedback. This action cannot be undone.
             </p>
             <div className="flex gap-3">
               <button
                 onClick={() => setIsDialogOpen(false)}
                 disabled={deleting}
-                className="flex-1 py-2.5 rounded-xl text-sm font-medium text-slate-400 border border-slate-700 hover:border-slate-600 hover:text-slate-200 hover:bg-slate-800 transition-all duration-200"
+                className="flex-1 py-2.5 rounded-xl text-sm font-medium text-slate-600 dark:text-slate-400 border border-slate-300 dark:border-slate-700 hover:border-slate-400 dark:border-slate-600 hover:text-slate-800 dark:text-slate-200 hover:bg-slate-100 dark:bg-slate-800 transition-all duration-200"
               >
                 Cancel
               </button>
