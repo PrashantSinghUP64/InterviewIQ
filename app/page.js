@@ -100,9 +100,10 @@ setTimeout(typeAnswer, 3000);
 
 // ─── CLIENT ROUTING INTERCEPT ───
 document.querySelectorAll('a[href="/sign-in"], a[href="/dashboard"]').forEach(a => {
-  a.addEventListener('click', e => {
+  a.addEventListener('click', function(e) {
     e.preventDefault();
-    router.push(a.getAttribute('href'));
+    e.stopPropagation();
+    window.location.href = a.getAttribute('href');
   });
 });
 
