@@ -20,10 +20,11 @@ const FILLER_WORDS = [
   "kind of", "right", "okay so", "actually", "literally",
 ];
 
-const analyseConfidence = (text) => {
+const analyseConfidence = (text, durationSecs = 0) => {
   if (!text?.trim()) return null;
   const lower = text.toLowerCase();
-  const totalWords = lower.trim().split(/\s+/).length;
+  const words = lower.trim().split(/\s+/);
+  const totalWords = words.length;
   const counts = {};
   let totalFillers = 0;
   FILLER_WORDS.forEach((filler) => {
@@ -31,10 +32,31 @@ const analyseConfidence = (text) => {
     const matches = lower.match(new RegExp(`\\b${escaped}\\b`, "gi"));
     if (matches?.length) { Object.assign(counts, { [filler]: matches.length }); totalFillers += matches.length; }
   });
+
+  // Filler penalty: each filler deducts more aggressively (3× weight)
+  const fillerRatio = totalFillers / Math.max(1, totalWords);
+  const fillerScore = Math.max(0, 1 - fillerRatio * 3);
+
+  // Length penalty: short answers are penalised regardless of filler count
+  let lengthMultiplier;
+  if (totalWords < 10)      lengthMultiplier = 0.35;
+  else if (totalWords < 25) lengthMultiplier = 0.60;
+  else if (totalWords < 50) lengthMultiplier = 0.80;
+  else                      lengthMultiplier = 1.00;
+
+  // Speech-rate check (words per minute)
+  let rateMultiplier = 1.0;
+  if (durationSecs > 5) {
+    const wpm = (totalWords / durationSecs) * 60;
+    if (wpm < 60 || wpm > 220) rateMultiplier = 0.80; // too slow or too rushed
+  }
+
+  const raw = fillerScore * lengthMultiplier * rateMultiplier * 100;
   return {
-    confidence: Math.max(0, Math.round((1 - totalFillers / totalWords) * 100)),
+    confidence: Math.max(5, Math.min(99, Math.round(raw))),
     totalFillers,
     counts,
+    totalWords,
   };
 };
 
@@ -336,27 +358,56 @@ const RecordAnswerSection = ({
         }
 
         try {
-          ctx.drawImage(videoRef.current, 0, 0, 32, 32);
-          const { data } = ctx.getImageData(0, 0, 32, 32);
-          let brightness = 0;
-          for (let i = 0; i < data.length; i += 4) {
-             brightness += (data[i] + data[i+1] + data[i+2]) / 3;
-          }
-          brightness /= (data.length / 4);
+          // Use a 64×64 sample for better resolution
+          const SAMPLE = 64;
+          canvas.width = SAMPLE; canvas.height = SAMPLE;
+          ctx.drawImage(videoRef.current, 0, 0, SAMPLE, SAMPLE);
+          const { data } = ctx.getImageData(0, 0, SAMPLE, SAMPLE);
 
-          const isActive = brightness > 5;
+          let totalBrightness = 0;
+          let centerBrightness = 0;
+          let skinTonePixels = 0;
+          const cMin = Math.floor(SAMPLE * 0.30), cMax = Math.floor(SAMPLE * 0.70); // middle 40%
+
+          for (let y = 0; y < SAMPLE; y++) {
+            for (let x = 0; x < SAMPLE; x++) {
+              const idx = (y * SAMPLE + x) * 4;
+              const r = data[idx], g = data[idx + 1], b = data[idx + 2];
+              const lum = (r + g + b) / 3;
+              totalBrightness += lum;
+              if (x >= cMin && x < cMax && y >= cMin && y < cMax) {
+                centerBrightness += lum;
+                // Loose skin-tone heuristic: reddish, not too dark, not saturated/white
+                if (r > 60 && r > g && r > b && (r - b) > 15 && r < 250 && g > 30) {
+                  skinTonePixels++;
+                }
+              }
+            }
+          }
+
+          const totalPixels  = SAMPLE * SAMPLE;
+          const centerPixels = (cMax - cMin) * (cMax - cMin);
+          totalBrightness /= totalPixels;
+          centerBrightness /= centerPixels;
+
+          // Face considered present only if frame is decently bright AND
+          // centre region shows skin-tone pixels OR centre is notably brighter than edges
+          const edgeBrightness = (totalBrightness * totalPixels - centerBrightness * centerPixels) /
+                                  (totalPixels - centerPixels);
+          const centerStandOut = centerBrightness > edgeBrightness * 1.15;
+          const isActive = totalBrightness > 30 && (skinTonePixels > 8 || centerStandOut);
+
           setCameraActive(isActive);
-          
           statsRef.current.total += 1;
           if (isActive) {
-             statsRef.current.present += 1;
-             setIsFaceMissing(false);
-             toast.dismiss("face-warning");
+            statsRef.current.present += 1;
+            setIsFaceMissing(false);
+            toast.dismiss("face-warning");
           } else {
-             setIsFaceMissing((prev) => {
-               if (!prev) toast.error("⚠️ Camera blocked or too dark", { id: "face-warning", duration: 10000 });
-               return true;
-             });
+            setIsFaceMissing((prev) => {
+              if (!prev) toast.error("⚠️ Face not detected — stay in frame", { id: "face-warning", duration: 10000 });
+              return true;
+            });
           }
         } catch (e) {
           setCameraActive(false);
@@ -400,9 +451,9 @@ const RecordAnswerSection = ({
 
   /* ── Live confidence ── */
   useEffect(() => {
-    if (!isRecording && userAnswer.trim()) setConfidenceResult(analyseConfidence(userAnswer));
+    if (!isRecording && userAnswer.trim()) setConfidenceResult(analyseConfidence(userAnswer, answerDuration));
     if (!userAnswer.trim()) setConfidenceResult(null);
-  }, [userAnswer, isRecording]);
+  }, [userAnswer, isRecording, answerDuration]);
 
   /* ── Speech tracking ── */
   useEffect(() => {
