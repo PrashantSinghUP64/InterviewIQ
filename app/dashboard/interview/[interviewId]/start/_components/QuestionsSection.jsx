@@ -20,7 +20,32 @@ const QuestionsSection = ({
   const textToSpeech = (text) => {
     if ("speechSynthesis" in window) {
       window.speechSynthesis.cancel();
-      window.speechSynthesis.speak(new SpeechSynthesisUtterance(text));
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.pitch = 0.95;
+      utterance.rate = 0.9;
+
+      const voices = window.speechSynthesis.getVoices();
+
+      // Common male names in TTS engines (Windows, Edge, Chrome)
+      const maleVoiceNames = ['male', 'david', 'mark', 'guy', 'ravi', 'prabhat', 'amit', 'christopher', 'eric', 'james', 'ryan', 'andrew'];
+
+      const indianMaleVoice = voices.find(voice => 
+        voice.lang.includes('en-IN') && maleVoiceNames.some(name => voice.name.toLowerCase().includes(name))
+      );
+
+      const anyMaleVoice = voices.find(voice => 
+        maleVoiceNames.some(name => voice.name.toLowerCase().includes(name))
+      );
+
+      // We explicitly avoid finding just *any* Indian voice because it might be Neerja/Heera (female).
+      // Fallback instantly to Indian Male -> Any Male -> Browser Default
+      if (indianMaleVoice) {
+        utterance.voice = indianMaleVoice;
+      } else if (anyMaleVoice) {
+        utterance.voice = anyMaleVoice;
+      }
+      
+      window.speechSynthesis.speak(utterance);
     } else {
       alert("Sorry, your browser does not support text to speech");
     }

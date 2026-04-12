@@ -133,8 +133,11 @@ const EyeContactMeter = ({ score, stream }) => {
   const [w, setW] = useState(0);
   useEffect(() => { const t = setTimeout(() => setW(displayScore), 80); return () => clearTimeout(t); }, [displayScore]);
   
+  // Score 0 = error state (no face detected or camera off)
+  const isError = displayScore === 0;
+
   const getStyle = (p, isOff) => {
-    if (isOff) return { grad: "from-slate-400 to-slate-500", text: "text-slate-500", shadow: "rgba(100,116,139,0.5)", label: "Camera Off" };
+    if (isOff || p === 0) return { grad: "from-red-500 to-red-600", text: "text-red-400", shadow: "rgba(239,68,68,0.5)", label: isOff ? "Camera Off" : "No Face Detected" };
     if (p >= 80) return { grad: "from-emerald-500 to-emerald-600", text: "text-emerald-400", shadow: "rgba(16,185,129,0.5)", label: `${p}%` };
     if (p >= 60) return { grad: "from-amber-500 to-amber-600", text: "text-amber-400", shadow: "rgba(245,158,11,0.5)", label: `${p}%` };
     return { grad: "from-red-500 to-red-600", text: "text-red-400", shadow: "rgba(239,68,68,0.5)", label: `${p}%` };
@@ -142,12 +145,21 @@ const EyeContactMeter = ({ score, stream }) => {
   const st = getStyle(displayScore, !isCameraOn);
 
   return (
-    <div className="rounded-xl bg-slate-100/50 dark:bg-slate-800/50 border border-indigo-500/25 p-4 mt-4 animate-[fadeUp_0.45s_ease_forwards]">
+    <div className={`rounded-xl border p-4 mt-4 animate-[fadeUp_0.45s_ease_forwards] ${
+      isError || !isCameraOn
+        ? "bg-red-500/5 border-red-500/30"
+        : "bg-slate-100/50 dark:bg-slate-800/50 border-indigo-500/25"
+    }`}>
       <div className="flex items-center justify-between mb-3">
         <div className="flex items-center gap-2">
           <Eye className="w-3.5 h-3.5 text-indigo-400" />
           <span className="text-xs font-semibold text-slate-700 dark:text-slate-300 uppercase tracking-wider">Eye Contact</span>
         </div>
+        {(isError || !isCameraOn) && (
+          <span className="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-red-500/15 border border-red-500/30 text-red-400">
+            ⚠ {!isCameraOn ? "Camera Off" : "Face Not Detected"}
+          </span>
+        )}
       </div>
       <div className="flex items-center gap-3">
         <div className="flex-1 h-3 bg-slate-200/60 dark:bg-slate-700/60 rounded-full overflow-hidden">
@@ -158,6 +170,13 @@ const EyeContactMeter = ({ score, stream }) => {
         </div>
         <span className={`text-xl font-bold tabular-nums ${st.text} text-nowrap`}>{st.label}</span>
       </div>
+      {(isError || !isCameraOn) && (
+        <p className="text-xs text-red-400/80 mt-2">
+          {!isCameraOn
+            ? "Enable your camera and stay in frame while recording."
+            : "Your face was not visible during recording. Ensure good lighting and look at the camera."}
+        </p>
+      )}
     </div>
   );
 };
@@ -390,12 +409,9 @@ const RecordAnswerSection = ({
           totalBrightness /= totalPixels;
           centerBrightness /= centerPixels;
 
-          // Face considered present only if frame is decently bright AND
-          // centre region shows skin-tone pixels OR centre is notably brighter than edges
-          const edgeBrightness = (totalBrightness * totalPixels - centerBrightness * centerPixels) /
-                                  (totalPixels - centerPixels);
-          const centerStandOut = centerBrightness > edgeBrightness * 1.15;
-          const isActive = totalBrightness > 30 && (skinTonePixels > 8 || centerStandOut);
+          // Face considered present ONLY if frame is decently bright AND
+          // centre region has visible skin-tone pixels (no skin = no face)
+          const isActive = totalBrightness > 30 && skinTonePixels > 8;
 
           setCameraActive(isActive);
           statsRef.current.total += 1;
@@ -421,9 +437,13 @@ const RecordAnswerSection = ({
       }
       toast.dismiss("face-warning");
       
-      if (!isRecording && statsRef.current.total > 0) {
+      // When recording stops, compute final attention score.
+      // If detection never ran (too-short recording), force 0 so user sees the failure.
+      if (!isRecording) {
         setFinalAttentionScore(
-          Math.max(0, Math.round((statsRef.current.present / Math.max(1, statsRef.current.total)) * 100))
+          statsRef.current.total > 0
+            ? Math.max(0, Math.round((statsRef.current.present / statsRef.current.total) * 100))
+            : 0
         );
       }
     }
