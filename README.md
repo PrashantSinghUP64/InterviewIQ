@@ -131,7 +131,7 @@ Most students read articles or ask friends to practice. **InterviewIQ simulates 
 ### 🗣️ Confidence Score (Filler Word Analysis)
 | Feature | Description |
 |---|---|
-| **11 Filler Words Tracked** | um, uh, like, basically, you know, sort of, kind of, right, okay so, actually, literally |
+| **11 Filler Words Tracked** | like, basically, you know, sort of, kind of, right, okay so, actually, literally |
 | **Multi-Factor Formula** | Filler penalty (3× weight) + length multiplier + speech rate check (60–220 WPM) |
 | **Honest Range** | Capped 5%–99% — never falsely perfect or zero |
 | **Visual Badges** | Each filler word shown with count — instant visibility into speaking habits |
