@@ -4,7 +4,7 @@
 
 # 🎤 InterviewIQ
 
-### *"Crack Every Interview. Land Every Offer."*
+### *"Crack Every Interview."*
 
 **India's #1 Free AI Mock Interview Platform — Practice with voice, get scored by AI, land your dream job**
 
