@@ -197,7 +197,7 @@ Most students read articles or ask friends to practice. **InterviewIQ simulates 
 ### 🌑 Landing Page — Dark Mode
 > *"India's #1 Free AI Mock Interview Platform · Powered by Gemini AI · 500+ Interview Topics · No Credit Card Required"*
 
-![Landing Page Dark](landing-dark.png)
+![Landing Page Dark](screenshots/landing-dark.png)
 
 Bold dark-themed hero — **"Ace Your Next Interview with AI"** — gradient glow background, clean nav with theme toggle.
 Two CTAs: **🚀 Start Interview Free** (primary, purple) + **▶ See How It Works** (secondary).
@@ -207,7 +207,7 @@ Two CTAs: **🚀 Start Interview Free** (primary, purple) + **▶ See How It Wor
 ### ☀️ Landing Page — Light Mode
 > Same powerful hero, fully responsive light theme
 
-![Landing Page Light](landing-light.png)
+![Landing Page Light](screenshots/landing-light.png)
 
 Soft gradient background — identical layout, optimized for light mode users. Dark/light toggle in top navbar switches instantly.
 
@@ -216,7 +216,7 @@ Soft gradient background — identical layout, optimized for light mode users. D
 ### ⚡ Features Grid — 6 Core Capabilities
 > Each card explains one key feature at a glance — instantly scannable for any visitor
 
-![Features Grid](features-grid.png)
+![Features Grid](screenshots/features-grid.png)
 
 | Feature Card | Tag | What It Does |
 |---|---|---|
@@ -232,7 +232,7 @@ Soft gradient background — identical layout, optimized for light mode users. D
 ### 🎯 CTA Section — Ready to Land Your Dream Job?
 > Conversion-focused bottom section with social proof and dual CTA
 
-![CTA Section](cta-section.png)
+![CTA Section](screenshots/cta-section.png)
 
 *"Join thousands of Indian students who cracked FAANG and top startups using InterviewIQ."*
 **🚀 Start Free Interview** (primary) + **📊 View Dashboard** (secondary).
@@ -243,7 +243,7 @@ Trust signals below: **100% Free · No Signup Required · Instant Access**
 ### 🔐 Sign-In Page — Production-Grade Auth
 > Split-screen: dark feature sidebar (left) + clean Clerk form (right)
 
-![Sign In](signin.png)
+![Sign In](screenshots/signin.png)
 
 - **Left panel**: "Ace Your Next **Interview with AI**" — feature list (AI Questions · Voice Analysis · Instant Feedback) + ⭐⭐⭐⭐⭐ 10,000+ interviews practised
 - **Right panel**: **Continue with Google / GitHub / LinkedIn** + Email login — "Secured by Clerk"
@@ -253,7 +253,7 @@ Trust signals below: **100% Free · No Signup Required · Instant Access**
 ### 🖥️ Dashboard — Smart Analytics (Dark Mode)
 > Everything at a glance — score, sessions, radar, progress, daily tip
 
-![Dashboard Dark](dashboard-dark.png)
+![Dashboard Dark](screenshots/dashboard-dark.png)
 
 - **Tip of the Day** banner — fresh insight every session
 - **Average Score** (0–100) + **Completed Sessions** counter (left column)
@@ -265,7 +265,7 @@ Trust signals below: **100% Free · No Signup Required · Instant Access**
 ### 🔥 Weak Areas + Action Center
 > Intelligent detection of struggling topics — with a one-click AI recovery plan
 
-![Weak Areas](weak-areas.png)
+![Weak Areas](screenshots/weak-areas.png)
 
 - 🔴 Red alert: *"Weak Areas Detected — scored poorly (under 7/10) on 5 recent questions"*
 - **Generate 3-Day Practice Plan** button (Groq AI creates focused study plan)
@@ -285,7 +285,7 @@ Trust signals below: **100% Free · No Signup Required · Instant Access**
 ### 📋 Previous Sessions + Debrief History
 > Full session history with Feedback and Retry — past debrief analyses below
 
-![Session History](session-history.png)
+![Session History](screenshots/session-history.png)
 
 - **Previous Sessions**: product manager (1yr · 01-04-2026) | software engineer (1yr · 01-04-2026)
   Each card has **📊 Feedback** + **🔄 Retry** buttons
@@ -296,7 +296,7 @@ Trust signals below: **100% Free · No Signup Required · Instant Access**
 ### 🆕 New Interview Setup — Step 1: Job Role
 > 2-step modal — focused, minimal, fast
 
-![Interview Setup Step 1](setup-step1.png)
+![Interview Setup Step 1](screenshots/setup-step1.png)
 
 **STEP 1 OF 2** — "What role are you preparing for?"
 - Job Role / Position (e.g. Software Engineer)
@@ -308,7 +308,7 @@ Trust signals below: **100% Free · No Signup Required · Instant Access**
 ### 🆕 New Interview Setup — Step 2: Details
 > AI tailors questions to your exact tech stack, experience, and difficulty level
 
-![Interview Setup Step 2](setup-step2.png)
+![Interview Setup Step 2](screenshots/setup-step2.png)
 
 **STEP 2 OF 2** — "Tell us more about the role"
 - Tech Stack / Description (e.g. AWS, React, Node.js)
@@ -321,7 +321,7 @@ Trust signals below: **100% Free · No Signup Required · Instant Access**
 ### 🎙️ Interview Pre-Check — Camera & Mic Setup
 > Review session details, grant permissions, then go live
 
-![Interview Pre-Check](interview-precheck.png)
+![Interview Pre-Check](screenshots/interview-precheck.png)
 
 - **Session Details**: Job Role: Software Engineer · Tech Stack: AWS · Experience: 2 Years
 - Right panel: Camera preview + **Grant Camera & Mic Access** button
@@ -333,7 +333,7 @@ Trust signals below: **100% Free · No Signup Required · Instant Access**
 ### 📡 Live Recording Session — Real-Time Interview
 > Question 1 of 5, webcam running, live transcript, face detection active
 
-![Live Session](live-session.png)
+![Live Session](screenshots/live-session.png)
 
 - Progress bar: **QUESTION 1 OF 5 — 0% complete** | Q1–Q5 navigation pills
 - **Left (Webcam panel)**: Mirror view + *"Unfocused / Too dark"* attention warning + *"Face not detected — stay in frame"* toast notification
@@ -346,7 +346,7 @@ Trust signals below: **100% Free · No Signup Required · Instant Access**
 ### 🏆 Streak Tracker — Daily Practice Habit
 > Gamified streak system with milestone badges and progress bar
 
-![Streak Tracker](streak-tracker.png)
+![Streak Tracker](screenshots/streak-tracker.png)
 
 - **1 day Current Streak** — "Just Started" badge
 - Next milestone: 3 days — 2 days to go (orange progress bar)
@@ -359,7 +359,7 @@ Trust signals below: **100% Free · No Signup Required · Instant Access**
 ### ⭐ STAR Answer Builder
 > Drop your messy raw stories — Groq AI rewrites into perfect STAR format instantly
 
-![STAR Builder](star-builder.png)
+![STAR Builder](screenshots/star-builder.png)
 
 - **Left panel (Draft)**: Story Title input + Raw Details textarea + **✨ Generate STAR Format** button
 - **Right panel (Story Bank)**: Past story — *"collage"* (31-03-2026) showing full STAR breakdown:
@@ -373,7 +373,7 @@ Trust signals below: **100% Free · No Signup Required · Instant Access**
 ### 🏢 Company Insights Explorer
 > FAANG + WITCH + Indian Unicorns — filter, search, get AI interview intelligence
 
-![Company Insights](companies.png)
+![Company Insights](screenshots/companies.png)
 
 - Filter tabs: **All · Big Tech · WITCH · Unicorn · FinTech**
 - Search bar: "Search companies..."
