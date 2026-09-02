@@ -396,8 +396,8 @@ const RecordAnswerSection = ({
               totalBrightness += lum;
               if (x >= cMin && x < cMax && y >= cMin && y < cMax) {
                 centerBrightness += lum;
-                // Loose skin-tone heuristic: reddish, not too dark, not saturated/white
-                if (r > 60 && r > g && r > b && (r - b) > 15 && r < 250 && g > 30) {
+                // Relaxed heuristic: handles darker lighting, backlighting, and various skin tones better
+                if (r > 30 && r >= g && r >= b && (r - b) > 5) {
                   skinTonePixels++;
                 }
               }
@@ -411,7 +411,8 @@ const RecordAnswerSection = ({
 
           // Face considered present ONLY if frame is decently bright AND
           // centre region has visible skin-tone pixels (no skin = no face)
-          const isActive = totalBrightness > 30 && skinTonePixels > 8;
+          // Relaxed thresholds to reduce false positives
+          const isActive = totalBrightness > 15 && skinTonePixels > 2;
 
           setCameraActive(isActive);
           statsRef.current.total += 1;
