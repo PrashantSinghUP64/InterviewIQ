@@ -15,7 +15,7 @@ export async function generateGroqAnalysis(prompt, systemPrompt = "You are an ex
           content: prompt,
         },
       ],
-      model: "llama3-8b-8192",
+      model: "openai/gpt-oss-20b",
       temperature: 0.7,
       max_tokens: 2048,
     });
